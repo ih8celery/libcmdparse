@@ -6,13 +6,15 @@
  * created thereby
  */
 
-#include <tap++/tap++.h>
-#include "include/options_parsing.h"
+#include "tap++/tap++.h"
+#include "options_parsing.h"
+
+#define ARGC 2
 
 using namespace TAP;
 
 int main() {
-  plan(2);
+  plan(4);
 
   util::option_parser parser;
   std::shared_ptr<util::option_t> opt;
@@ -23,7 +25,12 @@ int main() {
   opt = parser.option("--friends=[s]");
   ok(opt->collection == util::Collect_Prop::LIST, "LIST collection type");
 
-  // TODO add calls to parse, etc
+  char * args[] = { "--age=10", "--friends=james,mark,sylvester" };
+  auto info = parser.parse(args, ARGC);
+
+  is(info.count("age"), 1, "age may occur once and store one value");
+
+  is(info.count("friends"), 3, "friends may occur once, but processes arg into comma-separated list");
 
   done_testing();
 

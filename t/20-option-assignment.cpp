@@ -6,13 +6,15 @@
  * property is of interest
  */
 
-#include "include/options_parsing.h"
-#include <tap++/tap++.h>
+#include "options_parsing.h"
+#include "tap++/tap++.h"
+
+#define ARGC 7
 
 using namespace TAP;
 
 int main() {
-  plan(4);
+  plan(8);
 
   util::option_parser parser;
   std::shared_ptr<util::option_t> opt;
@@ -29,7 +31,16 @@ int main() {
   opt = parser.option("-wife=!s"); // eq_never
   ok(opt->assignment == util::Assign_Prop::EQ_NEVER, "equals sign not allowed in argument assignment");
 
-  // TODO add calls to parse, etc
+  char * args[] = { "data", "-wife", "ellen", "-age=42", "other", "-humanity=yes", "finally"};
+  auto info = parser.parse(args, ARGC); 
+
+  ok(info.rem.size() == 3, "found three non-options");
+
+  is(info.arg("wife"), "ellen", "wife's name is ellen");
+
+  is(info.arg("age"), "42", "age is 42");
+
+  is(info.arg("humanity"), "yes", "type is human");
 
   done_testing();
 

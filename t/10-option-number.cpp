@@ -5,13 +5,15 @@
  * calls to option_parser::option
  */
 
-#include <tap++/tap++.h>
-#include "include/options_parsing.h"
+#include "tap++/tap++.h"
+#include "options_parsing.h"
+
+#define ARGC 7
 
 using namespace TAP;
 
 int main () {
-  plan(3);
+  plan(7);
 
   util::option_parser parser;
   std::shared_ptr<util::option_t> opt;
@@ -28,7 +30,17 @@ int main () {
   opt = parser.option("-verbose*");
   ok(opt->number == util::Num_Prop::ZERO_MANY, "option explicitly assigned ZERO_MANY number with '*'");
 
-  // TODO add calls to parse, etc
+  char * args[] = {"-verbose", "-single", "data", "--has-opt", "other", "-verbose", "-verbose"};
+  
+  auto info = parser.parse(args, ARGC);
+
+  ok(info.rem.size() == 2, "two non-options found");
+
+  ok(info.count("verbose") == 3, "found three verbose options");
+
+  ok(info.has("has-opt"), "has option 'has-opt'");
+
+  ok(info.has("single"), "has option 'single'");
 
   done_testing();
 

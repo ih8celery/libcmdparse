@@ -8,24 +8,26 @@
  */
 
 #define WANT_TEST_EXTRAS
-#include <tap++/tap++.h>
-#include "include/options_parsing.h"
+#include "tap++/tap++.h"
+#include "options_parsing.h"
+
+#define ARGC 4
 
 using namespace TAP;
 
 int main () {
-  plan(10);
+  plan(12);
 
   util::option_parser parser;
   std::shared_ptr<util::option_t> opt;
 
   // definition of option/name
-  opt = parser.option("--has-opt", "name");
+  opt = parser.option("--has-opt*", "name");
   ok(opt->name == "name", "the second argument to option is the name");
   ok(parser.handle_has_name("--has-opt", "name"), "a handle is a string used to identify the option to use in parsing");
 
   // extended definition of option/name 
-  opt = parser.option("-repeat", "name");
+  opt = parser.option("-repeat*", "name");
   ok(opt->name == "name", "option may be specified in multiple calls so long as name is same"); // test name
 
   // TRY repeating handle
@@ -46,7 +48,12 @@ int main () {
   ok(parser.handle_has_name("-NAME", "NAME"), "multiple handles separated by '|'");
   ok(opt->name == "NAME", "when no name provided, option deduces name from last handle");
 
-  // TODO add calls to parse, etc
+  char * args[] = { "data", "--is-option", "--has-opt", "-repeat" };
+  auto info = parser.parse(args, ARGC);
+
+  ok(info.has("NAME"), "--is-option handle used");
+
+  ok(info.count("name") == 2, "option with name 'name' used twice");
 
   done_testing();
 
