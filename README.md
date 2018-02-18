@@ -15,7 +15,7 @@ constructive criticism is welcomed.
 
 # Details
 ##What is an option?
-
+// TODO
 
 ##Dependencies
   liboptparse depends only on the standard library of C++11
@@ -33,7 +33,7 @@ are essential to the library and will be discussed here.
 
   option\_info parse(char\*\* argv, int argc)
 
-    parse all known options from every word in argv
+    parse all known options from argc words in argv
 
   void clear\_options()
 
@@ -54,6 +54,10 @@ are essential to the library and will be discussed here.
   IterPair list(std::string name)
 
     return iterators denoting range of values stored under option name
+
+  std::vector<std::string> rem
+
+    contains the non-option strings from the parsing source
 ##Usage
 
 #Installation

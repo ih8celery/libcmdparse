@@ -1,4 +1,4 @@
-#include "include/options_parsing.h"
+#include "options_parsing.h"
 
 namespace util {
   /*
@@ -50,7 +50,7 @@ namespace util {
    * throws an option_language_error which takes a string containing
    * the context of exception
    */
-   std::shared_ptr<option_t> option_parser::option(const std::string& spec, const std::string& name = "") {
+   std::shared_ptr<option_t> option_parser::option(const std::string& spec, const std::string& name) {
     enum Option_State { NONE, END_PREFIX, PLUS_PREFIX, MINUS_PREFIX, NAME,
                         NUMBER, EQ, ARG, ARGLIST, ARGLIST_END, DONE } state = NONE;
 
@@ -131,7 +131,7 @@ namespace util {
         }
 
         if (ch == '+') {
-          state == END_PREFIX;
+          state = END_PREFIX;
         }
         else if (isdigit(ch) || isalpha(ch) || ch == '_') {
           state = NAME;

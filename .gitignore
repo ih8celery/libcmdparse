@@ -1,2 +1,9 @@
 **/*.o
+**/*.so
+**/CMakeCache.txt
+CMakeFiles
+lib/src/CMakeFiles
+**/*.cmake
+Makefile
+lib/src/Makefile
 lib/include/*.gch
