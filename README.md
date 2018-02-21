@@ -27,15 +27,15 @@ cases, option\_t need not be used directly. the other two classes
 are essential to the library and will be discussed here.
 
 ### option\_parser:
-  `std::shared\_ptr\<option\_t\> option(std::string spec, std::string name = "")`
+  `std::shared_ptr<option_t> option(std::string spec, std::string name = "")`
 
     create an option
 
-  `option\_info parse(char\*\* argv, int argc)`
+  `option_info parse(char** argv, int argc)`
 
     parse all known options from argc words in argv
 
-  `void clear\_options()`
+  `void clear_options()`
 
     free all memory used to store options
 ### option\_info:
