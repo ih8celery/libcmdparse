@@ -39,8 +39,8 @@ int main() {
   args[4] = (char*)"other";
   args[5] = (char*)"-humanity=yes";
   args[6] = (char *)"finally";
-  auto info = parser.parse(args, ARGC); 
 
+  util::option_info info = parser.parse(args, ARGC); 
   ok(info.rem.size() == 3, "found three non-options");
 
   is(info.arg("wife"), "ellen", "wife's name is ellen");

@@ -38,9 +38,9 @@ int main () {
   args[4] = (char*)"other";
   args[5] = (char*)"-verbose";
   args[6] = (char*)"-verbose";
-  
-  auto info = parser.parse(args, ARGC);
 
+  auto info = parser.parse(args, ARGC);
+  
   ok(info.rem.size() == 2, "two non-options found");
 
   ok(info.count("verbose") == 3, "found three verbose options");
