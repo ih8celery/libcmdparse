@@ -5,7 +5,7 @@ namespace util {
    * retrieve an option argument, returning deft_arg if the option
    * not found
    */
-  const std::string& option_info::arg(const std::string& name, const std::string& deft_arg) {
+  const std::string option_info::arg(const std::string& name, const std::string& deft_arg) {
     opt_data_t::const_iterator data = opt_data.find(name);
 
     if (data == opt_data.cend()) {
@@ -68,6 +68,7 @@ namespace util {
       else {
         ch = spec[index];
       }
+      index++;
 
       if (state == NONE) {
         if (!has_input) {
@@ -153,14 +154,16 @@ namespace util {
           state = NAME;
         }
         else {
-	  throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
+	  throw option_language_error(std::to_string(ch) + std::string(" invalid character for handle name: can only take word characters and '-'"));
         }
+
+        continue;
       }
       if (state == NAME) {
         if (!has_input) {
           if (!buf.str().empty()) {
             handles.push_back(buf.str());
-            buf.clear();
+            buf.str("");
           }
 
           state = DONE;
@@ -170,13 +173,13 @@ namespace util {
 
         if (ch == '|') { // reached the end of a handle
           handles.push_back(buf.str());
-          buf.clear();
+          buf.str("");
 
           state = NONE;
         }
         else if (ch == '=') {
           handles.push_back(buf.str());
-          buf.clear();
+          buf.str("");
 
           state = EQ;
 
@@ -185,7 +188,7 @@ namespace util {
         }
 	else if (ch == '?') {
 	  handles.push_back(buf.str());
-	  buf.clear();
+	  buf.str("");
 	  
 	  state = NUMBER;
 	  
@@ -193,7 +196,7 @@ namespace util {
 	}
 	else if (ch == '*') {
 	  handles.push_back(buf.str());
-	  buf.clear();
+	  buf.str("");
 
 	  state = NUMBER;
 
@@ -216,7 +219,7 @@ namespace util {
         }
 
         handles.push_back(buf.str());
-        buf.clear();
+        buf.str("");
 
         if (ch == '=') {
           state = EQ;
@@ -279,6 +282,8 @@ namespace util {
 	    throw option_language_error(std::string("expected eq modifier or arg spec"));
             break;
         }
+
+        continue;
       }
       if (state == ARG) {
         if (!has_input) {
@@ -313,6 +318,8 @@ namespace util {
 	    throw option_language_error(std::string("expected arg type or start of arg list"));
             break;
         }
+
+        continue;
       }
       if (state == ARGLIST) {
         if (!has_input) {
@@ -354,12 +361,12 @@ namespace util {
 
         if (ch == ']') {
           state = DONE;
-
-          continue;
         }
         else {
 	  throw option_language_error(std::string("expected ']' to conclude arg list"));
         }
+
+        continue;
       }
       if (state == DONE) {
         if (has_input) {
@@ -484,7 +491,7 @@ namespace util {
         opt = iter->second;
 
 	// compare option requirements with data and insert into opt_data mmap
-        if (opt->number == Num_Prop::ZERO_ONE && info.opt_data.find(opt->name) == info.opt_data.cend()) {
+        if (opt->number == Num_Prop::ZERO_ONE && info.opt_data.find(opt->name) != info.opt_data.cend()) {
           throw parse_error(std::string("no-repeat option with handle '") + handle + "' found more than once");
         }
         else {
@@ -502,7 +509,7 @@ namespace util {
               throw parse_error(std::string("option with handle '") + handle + "' is missing equals sign");
             }
             else {
-              args = handle.substr(eq_loc);
+              args = handle.substr(eq_loc+1);
             }
           }
           else if (opt->assignment == Assign_Prop::EQ_MAYBE) {
@@ -515,7 +522,7 @@ namespace util {
               }
             }
             else {
-              args = handle.substr(eq_loc);
+              args = handle.substr(eq_loc+1);
             }
           }
           else {
