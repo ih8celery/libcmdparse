@@ -31,7 +31,12 @@ int main() {
   opt = parser.option("-pi=?f");
   ok(opt->data_type == util::Data_Prop::FLOAT, "FLOATING POINT type can be given explicitly with 'f'");
 
-  char * args[] = { "-pi=3.14", "--age", "7", "--friend-name=xavier", "--name=george" };
+  char ** args = new char*[ARGC];
+  args[0] = (char*)"-pi=3.14";
+  args[1] = (char*)"--age";
+  args[2] = (char*)"7";
+  args[3] = (char*)"--friend-name=xavier";
+  args[4] = (char*)"--name=george";
   auto info = parser.parse(args, ARGC);
 
   ok(info.has("pi"), "option pi received");
@@ -46,5 +51,6 @@ int main() {
 
   done_testing();
 
+  delete [] args;
   return exit_status();
 }

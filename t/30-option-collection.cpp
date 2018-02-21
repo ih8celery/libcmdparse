@@ -25,7 +25,9 @@ int main() {
   opt = parser.option("--friends=[s]");
   ok(opt->collection == util::Collect_Prop::LIST, "LIST collection type");
 
-  char * args[] = { "--age=10", "--friends=james,mark,sylvester" };
+  char ** args = new char*[ARGC];
+  args[0] = (char*)"--age=10";
+  args[1] = (char*)"--friends=james,mark,sylvester";
   auto info = parser.parse(args, ARGC);
 
   is(info.count("age"), 1, "age may occur once and store one value");
@@ -34,5 +36,6 @@ int main() {
 
   done_testing();
 
+  delete [] args;
   return exit_status();
 }

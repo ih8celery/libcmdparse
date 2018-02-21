@@ -48,7 +48,11 @@ int main () {
   ok(parser.handle_has_name("-NAME", "NAME"), "multiple handles separated by '|'");
   ok(opt->name == "NAME", "when no name provided, option deduces name from last handle");
 
-  char * args[] = { "data", "--is-option", "--has-opt", "-repeat" };
+  char ** args = new char*[ARGC];
+  args[0] = (char*)"data";
+  args[1] = (char*)"--is-option";
+  args[2] = (char*)"--has-opt";
+  args[3] = (char*)"-repeat";
   auto info = parser.parse(args, ARGC);
 
   ok(info.has("NAME"), "--is-option handle used");
@@ -57,5 +61,6 @@ int main () {
 
   done_testing();
 
+  delete [] args;
   return exit_status();
 }

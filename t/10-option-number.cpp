@@ -30,7 +30,14 @@ int main () {
   opt = parser.option("-verbose*");
   ok(opt->number == util::Num_Prop::ZERO_MANY, "option explicitly assigned ZERO_MANY number with '*'");
 
-  char * args[] = {"-verbose", "-single", "data", "--has-opt", "other", "-verbose", "-verbose"};
+  char ** args = new char*[ARGC];
+  args[0] = (char*)"-verbose";
+  args[1] = (char*)"-single";
+  args[2] = (char*)"data";
+  args[3] = (char*)"--has-opt";
+  args[4] = (char*)"other";
+  args[5] = (char*)"-verbose";
+  args[6] = (char*)"-verbose";
   
   auto info = parser.parse(args, ARGC);
 
@@ -44,5 +51,6 @@ int main () {
 
   done_testing();
 
+  delete [] args;
   return exit_status();
 }

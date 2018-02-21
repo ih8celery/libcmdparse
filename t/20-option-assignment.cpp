@@ -31,7 +31,14 @@ int main() {
   opt = parser.option("-wife=!s"); // eq_never
   ok(opt->assignment == util::Assign_Prop::EQ_NEVER, "equals sign not allowed in argument assignment");
 
-  char * args[] = { "data", "-wife", "ellen", "-age=42", "other", "-humanity=yes", "finally"};
+  char ** args = new char*[ARGC];
+  args[0] = (char*)"data";
+  args[1] = (char*)"-wife";
+  args[2] = (char*)"ellen";
+  args[3] = (char*)"-age=42";
+  args[4] = (char*)"other";
+  args[5] = (char*)"-humanity=yes";
+  args[6] = (char *)"finally";
   auto info = parser.parse(args, ARGC); 
 
   ok(info.rem.size() == 3, "found three non-options");
@@ -44,5 +51,6 @@ int main() {
 
   done_testing();
 
+  delete [] args;
   return exit_status();
 }
