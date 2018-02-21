@@ -6,7 +6,7 @@
  * created thereby
  */
 
-#include "tap++/tap++.h"
+#include <tap++.h>
 #include "options_parsing.h"
 
 #define ARGC 2

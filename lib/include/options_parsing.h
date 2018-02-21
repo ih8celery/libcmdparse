@@ -59,7 +59,7 @@ namespace util {
 
     // get argument for option
     // deft_arg is the default argument returned when no arg present
-    const std::string& arg(const std::string& name, const std::string& deft_arg);
+    const std::string& arg(const std::string& name, const std::string& deft_arg = "");
 
     // get argument list
     const std::pair<opt_data_t::const_iterator, opt_data_t::const_iterator> list(const std::string& name);

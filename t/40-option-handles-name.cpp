@@ -8,7 +8,7 @@
  */
 
 #define WANT_TEST_EXTRAS
-#include "tap++/tap++.h"
+#include <tap++.h>
 #include "options_parsing.h"
 
 #define ARGC 4
@@ -37,7 +37,7 @@ int main () {
   TRY(parser.option("-age=i", "name"), "options with same name must have compatible properties");
 
   // TRY non-word characters in handle name
-  TRY(parser.option(), "handles must contain 'word' characters");
+  TRY(parser.option("-!!"), "handles must contain 'word' characters");
   note("handles may begin with digits, letters, or underscores.");
   note("after the beginning, handles may also contain hyphens");
 

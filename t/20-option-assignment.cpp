@@ -7,7 +7,7 @@
  */
 
 #include "options_parsing.h"
-#include "tap++/tap++.h"
+#include <tap++.h>
 
 #define ARGC 7
 

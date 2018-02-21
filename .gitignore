@@ -7,3 +7,4 @@ lib/src/CMakeFiles
 Makefile
 lib/src/Makefile
 lib/include/*.gch
+t/test_*

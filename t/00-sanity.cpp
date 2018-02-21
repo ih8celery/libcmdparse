@@ -1,9 +1,10 @@
 #define WANT_TEST_EXTRAS
 
 #include "options_parsing.h"
-#include "tap++/tap++.h"
+#include <tap++.h>
 
 using namespace util;
+using namespace TAP;
 
 int main(int argc, char ** argv) {
   TEST_START(3);
@@ -14,7 +15,7 @@ int main(int argc, char ** argv) {
 
   is(info.rem.size(), argc, "all arguments should be passed to rem");
   
-  END_TESTING();
+  TEST_END;
 
   return 0;  
 }
