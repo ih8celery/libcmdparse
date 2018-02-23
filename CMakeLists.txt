@@ -6,6 +6,8 @@ set (CMAKE_CXX_STANDARD 11)
 set (CUSTOM_TEST_DRIVER "${CMAKE_CURRENT_LIST_DIR}/lib/tap")
 set (PROJECT_HEADERS "${CMAKE_CURRENT_LIST_DIR}/lib/include")
 
+enable_testing ()
+
 include_directories (${PROJECT_HEADERS})
 
 add_subdirectory (lib/src)
