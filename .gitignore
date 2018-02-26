@@ -1,5 +1,5 @@
 lib/include/*.gch
-lib/src/optparse.so
+lib/src/liboptparse.so
 t/assignment
 t/test_*
 t/number
