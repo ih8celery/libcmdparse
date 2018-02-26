@@ -26,7 +26,7 @@ set (CUSTOM_TEST_EXECUTABLES
   "${EXECUTABLE_OUTPUT_PATH}/handles"
   "${EXECUTABLE_OUTPUT_PATH}/data")
 
-add_custom_target (run_tests
+add_custom_target (debug
   COMMAND ${CUSTOM_TEST_DRIVER} ${CUSTOM_TEST_EXECUTABLES})
 
 add_test (NAME test_sanity COMMAND sanity)

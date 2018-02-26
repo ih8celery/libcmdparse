@@ -41,31 +41,31 @@ so the question mark could be left out without changing the meaning.
 since no name is provided to the option method, the name of this
 option is deduced to be simply "histexpand".
 
-(may need storage property to control how new data is added)
-(need position property to enable BSD options)
-(need Assign\_Prop::STUCK)
-
-the following table enumerates all of the values of the four properties,
+the following lists enumerate all of the values of the four properties,
 their meanings, and the syntax used to set them. the parse input is the
 first argument passed to option\_parser's parse member, which has type
 char \*\*. a handle list is the group of handles separated in the
 option spec by pipes (|).
 
-number -> ZERO\_ONE | "?" at the end of the handle list (default) | option may occur zero or one time
-number -> ZERO\_MANY | "\*" at the end of the handle list | option may occur any number of times
+Num\_Prop:
+1. ZERO\_ONE | "?" at the end of the handle list (default) | option may occur zero or one time
+2. ZERO\_MANY | "\*" at the end of the handle list | option may occur any number of times
 
-assignment -> NO\_ASSIGN | option does not take arguments (default) | no syntax needed
-assignment -> EQ\_REQUIRED | option takes argument, but must use an equal sign | "=" after handle list and number modifiers, if any
-assignment -> EQ\_MAYBE | option takes arguments, but may use an equals sign or grab the next value in the parse input | "=?"
-assignment -> EQ\_NEVER | option takes arguments, but may not use an equals sign | "=!"
-assignment -> STUCK | option takes an argument that is appended to the handle | "=|" (not yet implemented)
+Assign\_Prop:
+1. NO\_ASSIGN | option does not take arguments (default) | no syntax needed
+2. EQ\_REQUIRED | option takes argument, but must use an equal sign | "=" after handle list and number modifiers, if any
+3. EQ\_MAYBE | option takes arguments, but may use an equals sign or grab the next value in the parse input | "=?"
+4. EQ\_NEVER | option takes arguments, but may not use an equals sign | "=!"
+5. STUCK | option takes an argument that is appended to the handle | "=|" (not yet implemented)
 
-collection -> SCALAR | argument treated as a single value for storage (default) | no syntax needed
-collection -> LIST | argument treated as comma-separated list, each element of which is stored separately | "[]" following assignment property, if any
+Collect\_Prop:
+1. SCALAR | argument treated as a single value for storage (default) | no syntax needed
+2. LIST | argument treated as comma-separated list, each element of which is stored separately | "[]" following assignment property, if any
 
-data\_type -> STRING | argument is a string (default) | "s" after assignment property or in "[]"
-data\_type -> INTEGER | argument must contain only digits | "i" ...
-data\_type -> FLOAT | argument must contain only digits or a period surrounded by digits | "f" ...
+Data\_Type:
+1. STRING | argument is a string (default) | "s" after assignment property or in "[]"
+2. INTEGER | argument must contain only digits | "i" ...
+3. FLOAT | argument must contain only digits or a period surrounded by digits | "f" ...
 
 ## API
   the library uses the util namespace. functionality is distributed
@@ -120,8 +120,11 @@ this scenario.
   building it requires CMake >= 3.0, Make, and a C++ compiler
 that supports C++11.
 
-  currently testing on your machine depends on libtap++ and uses a perl
-5 script included in the lib/ directory of the project. this script
+  all tests depend on libtap++.
+
+  if you want to run a more extensive test suite, debug tests are provided
+and run with `make debug`. currently *debug* testing on your machine uses
+a shell script included in the lib/ directory of the project. this script
 is a workaround to using CTest. you can avoid using this script and
 run ctest instead. instructions are given in the installation section
 
@@ -137,16 +140,16 @@ cmake .
 Then use make to build, test, and install:
 ```shell
 make
-make run_tests
+make test
 sudo make install
 ```
 
-make's `run_tests` target uses a perl script as a substitute for CTest,
-the test driver included with CMake, because CTest does not play well
-with unit test libraries. you can still run the `test` target to use
-CTest instead, or invoke ctest manually if you cannot or don't wish 
-to run the perl script. in that case, for better test output I 
-recommend that you invoke ctest yourself with the `--verbose` option.
+make's `debug` target can be used in place of `test`. it runs uses a
+shell script as a substitute for CTest, the test driver included with
+CMake, because CTest does not play well with unit test libraries.
+invoke ctest manually if you cannot or don't wish to run the script.
+in that case, for better test output I recommend that you invoke ctest
+with the `--verbose` option.
 
 ## Windows
 liboptparse doesn't support Windows
