@@ -4,10 +4,14 @@
 #
 
 while [ ! "$#" -eq 0 ]; do
-  if [ -x "$1" ]; then
+  if [ -d "$1" ]; then
+    for fname in "$1"/*; do
+      [ -f "$fname" -a -x "$fname" ] && $fname
+    done
+  elif [ -f "$1" -a -x "$1" ]; then
    dir=`cd $(dirname $1) && pwd`
    file=$(basename $1)   
-   $dir/$file && echo ""
+   $dir/$file
   else
     echo "error: expected argument to be executable"
     exit 1
