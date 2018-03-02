@@ -54,14 +54,33 @@ namespace util {
     return (opt_data.find(name) != opt_data.cend());
   }
 
+  /* 
+   * configure opt_parser's case sensitivity when parsing ARGV.
+   * case sensitivity of option names and stored handles is NOT affected 
+   */
   void opt_parser::set(const config_constants::case_sensitive_t& c, bool val) {
     is_case_sensitive = val;
   }
 
+  /* 
+   * configure opt_parser's ability to detect bsd-style options in argv.
+   * zero or more bsd-style options may then appear at the beginning of argv,
+   * under the following conditions:
+   *   1. option prefixes (-, --, +, etc) are not allowed in these options
+   *   2. option handles must be exactly one letter long without a prefix
+   *   3. options must be concatenated into one string, stored in argv[0]
+   *   4. the first invalid or incomplete option causes parsing to fail
+   */
   void opt_parser::set(const config_constants::bsd_opt_t& c, bool val) {
     is_bsd_opt_enabled = val;
   }
 
+  /*
+   * configure opt_parser's ability to detect merged options in argv.
+   * merged options are identical to bsd-style options except in one
+   * respect: the first option detected in argv[0] must include its
+   * prefix
+   */
   void opt_parser::set(const config_constants::merged_opt_t& c, bool val) {
     is_merged_opt_enabled = val;
   }
@@ -72,8 +91,7 @@ namespace util {
    * see doc/option/spec.md and doc/option/properties.md for full 
    * description of options
    *
-   * throws an option_language_error which takes a string containing
-   * the context of exception
+   * throws an option_language_error if something goes wrong
    */
    option_t opt_parser::option(const std::string& spec, const std::string& name) {
     enum Option_State { NONE, END_PREFIX, PLUS_PREFIX, MINUS_PREFIX, NAME,
@@ -473,12 +491,11 @@ namespace util {
   }
 
   /*
-   * extract options and non-options from source char ** into opt_info
-   * object. the source is not modified, and the scope of the scan is 
-   * limited to indices less than argc.
+   * extract options and non-options from argv into opt_info
+   * object. any options or data belonging to options is removed from
+   * argv and replaced with nullptr TODO(and discard opt_info::rem)
    *
-   * throws a parse_error which takes a string containing the context
-   * of an exception
+   * throws a parse_error if something goes wrong
    */
   opt_info opt_parser::parse(char ** &argv, int argc) {
     opt_info info;
