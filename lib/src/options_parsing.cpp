@@ -8,10 +8,12 @@ namespace util {
     struct case_sensitive_t {};
     struct bsd_opt_t {};
     struct merged_opt_t {};
+    struct error_if_unknown_t {};
 
     const case_sensitive_t case_sensitive = case_sensitive_t();
     const bsd_opt_t bsd_opt = bsd_opt_t();
     const merged_opt_t merged_opt = merged_opt_t();
+    const error_if_unknown_t error_unknown = error_if_unknown_t();
   }
 
   /*
@@ -56,7 +58,9 @@ namespace util {
 
   /* 
    * configure opt_parser's case sensitivity when parsing ARGV.
-   * case sensitivity of option names and stored handles is NOT affected 
+   * case sensitivity of option names and stored handles is NOT affected
+   *
+   * default: true
    */
   void opt_parser::set(const config_constants::case_sensitive_t& c, bool val) {
     is_case_sensitive = val;
@@ -70,6 +74,8 @@ namespace util {
    *   2. option handles must be exactly one letter long without a prefix
    *   3. options must be concatenated into one string, stored in argv[0]
    *   4. the first invalid or incomplete option causes parsing to fail
+   *
+   * default: false
    */
   void opt_parser::set(const config_constants::bsd_opt_t& c, bool val) {
     is_bsd_opt_enabled = val;
@@ -80,9 +86,22 @@ namespace util {
    * merged options are identical to bsd-style options except in one
    * respect: the first option detected in argv[0] must include its
    * prefix
+   *
+   * default: false
    */
   void opt_parser::set(const config_constants::merged_opt_t& c, bool val) {
     is_merged_opt_enabled = val;
+  }
+
+  /*
+   * configure opt_parser's response to a char* in argv that resembles
+   * a valid option but is not known to the parser. true causes error
+   * to be thrown
+   *
+   * default: true
+   */
+  void opt_parser::set(const config_constants::error_if_unknown_t& c, bool val) {
+    is_error_unknown_enabled = val;
   }
 
   /*

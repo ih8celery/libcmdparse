@@ -19,10 +19,12 @@ namespace util {
     struct case_sensitive_t;
     struct bsd_opt_t;
     struct merged_opt_t;
+    struct error_if_unknown_t;
 
     extern const case_sensitive_t case_sensitive;
     extern const bsd_opt_t bsd_opt;
     extern const merged_opt_t merged_opt;
+    extern const error_if_unknown_t error_unknown;
   }
 
   enum class Num_Prop { ZERO_ONE, ZERO_MANY };
@@ -79,11 +81,17 @@ namespace util {
 
   class opt_parser {
     public:
+      opt_parser() : is_case_sensitive(true),
+                     is_bsd_opt_enabled(false),
+                     is_merged_opt_enabled(false),
+                     is_error_unknown_enabled(true) {}
+
       option_t option(const std::string&, const std::string& = "");
 
       void set(const config_constants::case_sensitive_t&, bool = true);
       void set(const config_constants::bsd_opt_t&, bool = true);
       void set(const config_constants::merged_opt_t&, bool = true);
+      void set(const config_constants::error_if_unknown_t&, bool = true);
 
       std::pair<bool, std::string>
         get_opt(std::string spec, char ** &argv, int argc);
@@ -117,6 +125,7 @@ namespace util {
       bool is_case_sensitive;
       bool is_bsd_opt_enabled;
       bool is_merged_opt_enabled;
+      bool is_error_unknown_enabled;
   };
 
   class parse_error : std::exception {
