@@ -1,8 +1,5 @@
 set (EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_LIST_DIR})
 
-add_executable (sanity "00-sanity.cpp")
-target_link_libraries (sanity tap++ optparse)
-
 add_executable (number "10-option-number.cpp")
 target_link_libraries (number tap++ optparse)
 
@@ -19,7 +16,6 @@ add_executable (data "50-option-data.cpp")
 target_link_libraries (data tap++ optparse)
 
 set (CUSTOM_TEST_EXECUTABLES 
-  "${EXECUTABLE_OUTPUT_PATH}/sanity" 
   "${EXECUTABLE_OUTPUT_PATH}/number" 
   "${EXECUTABLE_OUTPUT_PATH}/assignment" 
   "${EXECUTABLE_OUTPUT_PATH}/collection"
@@ -29,7 +25,6 @@ set (CUSTOM_TEST_EXECUTABLES
 add_custom_target (debug
   COMMAND ${CUSTOM_TEST_DRIVER} ${CUSTOM_TEST_EXECUTABLES})
 
-add_test (NAME test_sanity COMMAND sanity)
 add_test (NAME test_number COMMAND number)
 add_test (NAME test_assignment COMMAND assignment)
 add_test (NAME test_collection COMMAND collection)
