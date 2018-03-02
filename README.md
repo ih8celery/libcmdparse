@@ -26,7 +26,6 @@ such as "--version" or "-V". the user provides handles at the time
 options are defined; an option's name is either the second argument
 to option\_parser's option member or is deduced from the list of
 handles.
-[[incompatibility?]]
 options have four properties: number, assignment, collection, and 
 data type, which are used to express the full range of possible option
 implementations. a typical boolean option, for instance,
