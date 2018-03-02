@@ -16,14 +16,14 @@ using namespace TAP;
 int main() {
   plan(4);
 
-  util::option_parser parser;
-  std::shared_ptr<util::option_t> opt;
+  util::opt_parser parser;
+  util::option_t opt;
 
   opt = parser.option("--age=i");
-  ok(opt->collection == util::Collect_Prop::SCALAR, "collection type is SCALAR by default");
+  ok(opt.collection == util::Collect_Prop::SCALAR, "collection type is SCALAR by default");
   
   opt = parser.option("--friends=[s]");
-  ok(opt->collection == util::Collect_Prop::LIST, "LIST collection type");
+  ok(opt.collection == util::Collect_Prop::LIST, "LIST collection type");
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"--age=10";

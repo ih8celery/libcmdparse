@@ -18,12 +18,12 @@ using namespace TAP;
 int main () {
   plan(9);
 
-  util::option_parser parser;
-  std::shared_ptr<util::option_t> opt;
+  util::opt_parser parser;
+  util::option_t opt;
 
   // definition of option/name
   opt = parser.option("--has-opt*", "name");
-  ok(opt->name == "name", "the second argument to option is the name");
+  ok(opt.name == "name", "the second argument to option is the name");
   ok(parser.handle_has_name("--has-opt", "name"), "a handle is a string used to identify the option to use in parsing");
 
   // extended definition of option/name 
@@ -46,7 +46,7 @@ int main () {
   ok(parser.handle_has_name("--is-opt", "NAME"), "multiple handles separated by '|'");
   ok(parser.handle_has_name("--is-option", "NAME"), "multiple handles separated by '|'");
   ok(parser.handle_has_name("-NAME", "NAME"), "multiple handles separated by '|'");
-  ok(opt->name == "NAME", "when no name provided, option deduces name from last handle");
+  ok(opt.name == "NAME", "when no name provided, option deduces name from last handle");
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"data";

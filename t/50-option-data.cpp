@@ -16,20 +16,20 @@ using namespace TAP;
 int main() {
   plan(9);
 
-  util::option_parser parser;
-  std::shared_ptr<util::option_t> opt;
+  util::opt_parser parser;
+  util::option_t opt;
 
   opt = parser.option("--name=");
-  ok(opt->data_type == util::Data_Prop::STRING, "data type is STRING by default");
+  ok(opt.data_type == util::Data_Prop::STRING, "data type is STRING by default");
   
   opt = parser.option("--friend-name=s");
-  ok(opt->data_type == util::Data_Prop::STRING, "STRING type can be given explicitly with 's'");
+  ok(opt.data_type == util::Data_Prop::STRING, "STRING type can be given explicitly with 's'");
 
   opt = parser.option("--age=!i");
-  ok(opt->data_type == util::Data_Prop::INTEGER, "INTEGER type can be given explicitly with 'i'");
+  ok(opt.data_type == util::Data_Prop::INTEGER, "INTEGER type can be given explicitly with 'i'");
 
   opt = parser.option("-pi=?f");
-  ok(opt->data_type == util::Data_Prop::FLOAT, "FLOATING POINT type can be given explicitly with 'f'");
+  ok(opt.data_type == util::Data_Prop::FLOAT, "FLOATING POINT type can be given explicitly with 'f'");
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"-pi=3.14";
