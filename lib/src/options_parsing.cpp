@@ -115,7 +115,14 @@ namespace util {
   }
 
   /*
+   * configure opt_parser's ability to detect subcommands. opt_parser
+   * may not support subcommands and merged options or bsd options
+   * simultaneously. a subcommand may be any valid handle, but it must
+   * appear in argv[0]. if subcommands are enabled, it is an error
+   * not to provide one. subcommands may still be declared in the
+   * option spec, but will be ignored if this setting is false.
    *
+   * default: false
    */
   void opt_parser::set(const config_constants::subcommand_t& c, bool val) {
     is_subcommand_enabled = true;
