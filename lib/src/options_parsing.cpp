@@ -13,11 +13,13 @@ namespace util {
     struct bsd_opt_t {};
     struct merged_opt_t {};
     struct error_if_unknown_t {};
+    struct subcommand_t {};
 
     const case_sensitive_t case_sensitive = case_sensitive_t();
     const bsd_opt_t bsd_opt = bsd_opt_t();
     const merged_opt_t merged_opt = merged_opt_t();
     const error_if_unknown_t error_unknown = error_if_unknown_t();
+    const subcommand_t sub = subcommand_t();
   }
 
   /*
@@ -110,6 +112,13 @@ namespace util {
                        bool val) {
 
     is_error_unknown_enabled = val;
+  }
+
+  /*
+   *
+   */
+  void opt_parser::set(const config_constants::subcommand_t& c, bool val) {
+    is_subcommand_enabled = true;
   }
 
   /*

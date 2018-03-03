@@ -20,11 +20,13 @@ namespace util {
     struct bsd_opt_t;
     struct merged_opt_t;
     struct error_if_unknown_t;
+    struct subcommand_t;
 
     extern const case_sensitive_t case_sensitive;
     extern const bsd_opt_t bsd_opt;
     extern const merged_opt_t merged_opt;
     extern const error_if_unknown_t error_unknown;
+    extern const subcommand_t sub;
   }
 
   enum class Mod_Prop { NONE, BEFORE, AFTER, SUB, NOT_WITH };
@@ -88,6 +90,7 @@ namespace util {
       opt_parser() : is_case_sensitive(true),
                      is_bsd_opt_enabled(false),
                      is_merged_opt_enabled(false),
+                     is_subcommand_enabled(false),
                      is_error_unknown_enabled(true) {}
 
       option_t option(const std::string&, const std::string& = "");
@@ -96,6 +99,7 @@ namespace util {
       void set(const config_constants::bsd_opt_t&, bool = true);
       void set(const config_constants::merged_opt_t&, bool = true);
       void set(const config_constants::error_if_unknown_t&, bool = true);
+      void set(const config_constants::subcommand_t&, bool = true);
 
       std::pair<bool, std::string>
         get_opt(std::string spec, char ** &argv, int argc);
@@ -130,6 +134,7 @@ namespace util {
       bool is_bsd_opt_enabled;
       bool is_merged_opt_enabled;
       bool is_error_unknown_enabled;
+      bool is_subcommand_enabled;
   };
 
   class parse_error : std::exception {
