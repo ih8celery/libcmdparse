@@ -253,7 +253,7 @@ namespace util {
         break;
       case MINUS_PREFIX:
         if (!has_input) {
-	      throw option_language_error(std::string("input ended before handle complete"));
+        throw option_language_error(std::string("input ended before handle complete"));
         }
 
         if (ch == '-') {
@@ -263,7 +263,7 @@ namespace util {
           state = NAME;
         }
         else {
-	      throw option_language_error(std::string("input ended before handle complete"));
+        throw option_language_error(std::string("input ended before handle complete"));
         }
 
         buf << ch;
@@ -271,7 +271,7 @@ namespace util {
         break;
       case PLUS_PREFIX:
         if (!has_input) {
-	      throw option_language_error(std::string("input ended before handle complete"));
+        throw option_language_error(std::string("input ended before handle complete"));
         }
 
         if (ch == '+') {
@@ -281,13 +281,13 @@ namespace util {
           state = NAME;
         }
         else {
-	      throw option_language_error(std::string("input ended before handle complete"));
+        throw option_language_error(std::string("input ended before handle complete"));
         }
 
         break;
       case PREFIX_END:
         if (!has_input) {
-	      throw option_language_error(std::string("input ended before hande complete"));
+        throw option_language_error(std::string("input ended before hande complete"));
         }
 
         if (isdigit(ch) || isalpha(ch) || ch == '_') {
@@ -296,7 +296,7 @@ namespace util {
           state = NAME;
         }
         else {
-	      throw option_language_error(std::to_string(ch)
+        throw option_language_error(std::to_string(ch)
             + std::string(" invalid character for handle name: can only take word characters and '-'"));
         }
 
@@ -330,27 +330,27 @@ namespace util {
           opt.collection = Collect_Prop::SCALAR;
           break;
         case '?':
-	      handles.push_back(buf.str());
-	      buf.str("");
-	  
-	      state = NUMBER;
-	  
-	      opt.number = Num_Prop::ZERO_ONE;
-	      break;
+        handles.push_back(buf.str());
+        buf.str("");
+    
+        state = NUMBER;
+    
+        opt.number = Num_Prop::ZERO_ONE;
+        break;
         case '*':
-	      handles.push_back(buf.str());
-	      buf.str("");
+        handles.push_back(buf.str());
+        buf.str("");
 
-	      state = NUMBER;
+        state = NUMBER;
 
-	      opt.number = Num_Prop::ZERO_MANY;
-	      break;
+        opt.number = Num_Prop::ZERO_MANY;
+        break;
         default:
           if (isdigit(ch) || isalpha(ch) || ch == '_' || ch == '-') {
             buf << ch;
           }
           else {
-	        throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
+          throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
           }
           break;
         }
@@ -423,7 +423,7 @@ namespace util {
 
             break;
           default:
-	        throw option_language_error(std::string(
+          throw option_language_error(std::string(
                         "expected eq modifier or arg spec"));
             break;
         }
@@ -459,7 +459,7 @@ namespace util {
 
             break;
           default:
-	        throw option_language_error(std::string(
+          throw option_language_error(std::string(
                         "expected arg type or start of arg list"));
             break;
         }
@@ -467,7 +467,7 @@ namespace util {
         break;
       case ARGLIST:
         if (!has_input) {
-	      throw option_language_error(std::string(
+        throw option_language_error(std::string(
                       "input ended in arg list"));
         }
 
@@ -493,7 +493,7 @@ namespace util {
 
             break;
           default:
-	        throw option_language_error(std::string(
+          throw option_language_error(std::string(
                         "expected arg type or end of arg list"));
             break;
         }
@@ -501,7 +501,7 @@ namespace util {
         break;
       case ARGLIST_END:
         if (!has_input) {
-	      throw option_language_error(std::string(
+        throw option_language_error(std::string(
                       "input ended before arg list finished"));
         }
 
@@ -509,7 +509,7 @@ namespace util {
           state = DONE;
         }
         else {
-	      throw option_language_error(std::string(
+        throw option_language_error(std::string(
                       "expected ']' to conclude arg list"));
         }
 
@@ -528,14 +528,14 @@ namespace util {
             std::string::size_type ind = 0;
             
             if (isalpha(maybe_name[0]) || isdigit(maybe_name[0]) || maybe_name[0] == '_') {
-	          ind = 0;
-	        }
-	        else if (isalpha(maybe_name[1]) || isdigit(maybe_name[1]) || maybe_name[1] == '_') {
-	          ind = 1;
-	        }
-	        else {
-	          ind = 2;
-	        }
+            ind = 0;
+          }
+          else if (isalpha(maybe_name[1]) || isdigit(maybe_name[1]) || maybe_name[1] == '_') {
+            ind = 1;
+          }
+          else {
+            ind = 2;
+          }
 
             if (maybe_name.size() == ind + 1) { // NOTE: this situation should never happen
               throw option_language_error(std::string("handle minus prefix is the empty string"));
@@ -595,7 +595,7 @@ namespace util {
   /*
    * extract options and non-options from argv into opt_info
    * object. any options or data belonging to options is removed from
-   * argv and replaced with nullptr TODO(and discard opt_info::rem)
+   * argv and replaced with nullptr
    *
    * throws a parse_error if something goes wrong
    */
@@ -613,7 +613,13 @@ namespace util {
 
       // get the handle
       if (eq_loc == std::string::npos) { // no equals sign, so entire word is handle
-        iter = handle_map.find(handle);
+        if (is_case_sensitive) {
+          iter = handle_map.find(handle);
+        }
+        else {
+          // TODO use lowercase
+          iter = handle_map.find(handle);
+        }
       }
       else { // found equals sign, so only the substring up to the equals sign 
         iter = handle_map.find(handle.substr(0, eq_loc));
@@ -621,19 +627,18 @@ namespace util {
  
       // handle is unknown, so it is either a malformed option or a non-option
       if (iter == handle_map.cend()) {
-        // check for a prefix
-        if (handle[0] == '-' || handle[0] == '+' || handle[0] == ':' || handle[0] == '.' || handle[0] == '/') { // malformed option
+        if (IS_PREFIX(handle[0]) && is_error_unknown_enabled) {
           throw parse_error(std::string("unknown option with handle: ") + handle); 
         }
-        else { // non-option
+        else {
           info.rem.push_back(handle);
           continue;
         }
       }
-      else { // found handle of a known option
+      else {
         opt = iter->second;
 
-	// compare option requirements with data and insert into opt_data mmap
+        // compare option requirements with data and insert into opt_data mmap
         if (opt.number == Num_Prop::ZERO_ONE && info.opt_data.find(opt.name) != info.opt_data.cend()) {
           throw parse_error(std::string("no-repeat option with handle '") + handle + "' found more than once");
         }
@@ -682,7 +687,7 @@ namespace util {
             }
           }
 
-	  bool parse_failed(false);
+    bool parse_failed(false);
           enum { START, PRE, DOT, POST } state = START;
           if (opt.collection == Collect_Prop::SCALAR) {
               if (info.opt_data.find(opt.name) == info.opt_data.cend()) {
@@ -737,7 +742,7 @@ namespace util {
             while (std::getline(src, data, ',')) {
               if (opt.data_type == Data_Prop::STRING);
               else if (opt.data_type == Data_Prop::INTEGER) {
-		for (const char& ch : data) {
+    for (const char& ch : data) {
                   if (!isdigit(ch)) {
                     parse_failed = true;
                     break;
