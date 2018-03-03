@@ -107,22 +107,29 @@ namespace util {
   /*
    * declare an option to the parser where option name is
    * the second argument to the function
-   * see doc/option/spec.md and doc/option/properties.md for full 
-   * description of options
+   * see doc/option/spec.md for full description of options
    *
    * throws an option_language_error if something goes wrong
    */
-   option_t opt_parser::option(const std::string& spec, const std::string& name) {
-    enum Option_State { NONE, END_PREFIX, PLUS_PREFIX, MINUS_PREFIX, NAME,
-                        NUMBER, EQ, ARG, ARGLIST, ARGLIST_END, DONE } state = NONE;
+  option_t opt_parser::option(const std::string& spec,
+                              const std::string& name) {
+
+    enum Option_State { MOD, NONE, END_PREFIX, PLUS_PREFIX, MINUS_PREFIX,
+                        NAME, NUMBER, EQ, ARG, ARGLIST, ARGLIST_END,
+                        DONE } state = MOD;
 
     option_t opt;
     std::vector<std::string> handles;
     std::ostringstream buf;
 
     bool has_input = true;
-    std::string::size_type index = 0;
-    char ch;
+    std::string::size_type index = 0; // current spec index
+    char ch;                          // current spec character
+
+    /* 
+     * this loop processes the spec and name into an option_t object,
+     * which is returned at the end of the switch case/DONE
+     */
     while (true) {
       if (index >= spec.size()) {
         has_input = false;
@@ -132,11 +139,14 @@ namespace util {
       }
       index++;
 
-      if (state == NONE) {
+      /* execute code on the state of the option parser */
+      switch(state) {
+      case MOD:
+      case NONE:
         if (!has_input) {
           state = DONE;
 
-          continue;
+          break;
         }
 
         switch (ch) {
@@ -167,11 +177,10 @@ namespace util {
 
         buf << ch;
 
-        continue;
-      }
-      if (state == MINUS_PREFIX) {
+        break;
+      case MINUS_PREFIX:
         if (!has_input) {
-	  throw option_language_error(std::string("input ended before handle complete"));
+	      throw option_language_error(std::string("input ended before handle complete"));
         }
 
         if (ch == '-') {
@@ -181,16 +190,15 @@ namespace util {
           state = NAME;
         }
         else {
-	  throw option_language_error(std::string("input ended before handle complete"));
+	      throw option_language_error(std::string("input ended before handle complete"));
         }
 
         buf << ch;
 
-        continue;
-      }
-      if (state == PLUS_PREFIX) {
+        break;
+      case PLUS_PREFIX:
         if (!has_input) {
-	  throw option_language_error(std::string("input ended before handle complete"));
+	      throw option_language_error(std::string("input ended before handle complete"));
         }
 
         if (ch == '+') {
@@ -200,14 +208,13 @@ namespace util {
           state = NAME;
         }
         else {
-	  throw option_language_error(std::string("input ended before handle complete"));
+	      throw option_language_error(std::string("input ended before handle complete"));
         }
 
-        continue;
-      }
-      if (state == END_PREFIX) {
+        break;
+      case END_PREFIX:
         if (!has_input) {
-	  throw option_language_error(std::string("input ended before hande complete"));
+	      throw option_language_error(std::string("input ended before hande complete"));
         }
 
         if (isdigit(ch) || isalpha(ch) || ch == '_') {
@@ -216,12 +223,12 @@ namespace util {
           state = NAME;
         }
         else {
-	  throw option_language_error(std::to_string(ch) + std::string(" invalid character for handle name: can only take word characters and '-'"));
+	      throw option_language_error(std::to_string(ch)
+            + std::string(" invalid character for handle name: can only take word characters and '-'"));
         }
 
-        continue;
-      }
-      if (state == NAME) {
+        break;
+      case NAME:
         if (!has_input) {
           if (!buf.str().empty()) {
             handles.push_back(buf.str());
@@ -230,16 +237,17 @@ namespace util {
 
           state = DONE;
 
-          continue;
+          break;
         }
 
-        if (ch == '|') { // reached the end of a handle
+        switch (ch) {
+        case '|':
           handles.push_back(buf.str());
           buf.str("");
 
           state = NONE;
-        }
-        else if (ch == '=') {
+          break;
+        case '=':
           handles.push_back(buf.str());
           buf.str("");
 
@@ -247,37 +255,39 @@ namespace util {
 
           opt.assignment = Assign_Prop::EQ_REQUIRED;
           opt.collection = Collect_Prop::SCALAR;
-        }
-	else if (ch == '?') {
-	  handles.push_back(buf.str());
-	  buf.str("");
+          break;
+        case '?':
+	      handles.push_back(buf.str());
+	      buf.str("");
 	  
-	  state = NUMBER;
+	      state = NUMBER;
 	  
-	  opt.number = Num_Prop::ZERO_ONE;
-	}
-	else if (ch == '*') {
-	  handles.push_back(buf.str());
-	  buf.str("");
+	      opt.number = Num_Prop::ZERO_ONE;
+	      break;
+        case '*':
+	      handles.push_back(buf.str());
+	      buf.str("");
 
-	  state = NUMBER;
+	      state = NUMBER;
 
-	  opt.number = Num_Prop::ZERO_MANY;
-	}	
-        else if (isdigit(ch) || isalpha(ch) || ch == '_' || ch == '-') {
-          buf << ch;
+	      opt.number = Num_Prop::ZERO_MANY;
+	      break;
+        default:
+          if (isdigit(ch) || isalpha(ch) || ch == '_' || ch == '-') {
+            buf << ch;
+          }
+          else {
+	        throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
+          }
+          break;
         }
-        else {
-	  throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
-        }
 
-        continue;
-      }
-      if (state == NUMBER) {
+        break;
+      case NUMBER:
         if (!has_input) {
           state = DONE;
 
-          continue;
+          break;
         }
 
         handles.push_back(buf.str());
@@ -299,13 +309,12 @@ namespace util {
           throw option_language_error(std::string("expected '=' or '[' after number"));
         }
 
-        continue;
-      }
-      if (state == EQ) {
+        break;
+      case EQ:
         if (!has_input) {
           state = DONE;
 
-          continue;
+          break;
         }
 
         switch (ch) {
@@ -341,18 +350,18 @@ namespace util {
 
             break;
           default:
-	    throw option_language_error(std::string("expected eq modifier or arg spec"));
+	        throw option_language_error(std::string(
+                        "expected eq modifier or arg spec"));
             break;
         }
 
-        continue;
-      }
-      if (state == ARG) {
+        break;
+      case ARG:
         if (!has_input) {
           opt.data_type = Data_Prop::STRING;
           state = DONE;
 
-          continue;
+          break;
         }
 
         switch (ch) {
@@ -377,15 +386,16 @@ namespace util {
 
             break;
           default:
-	    throw option_language_error(std::string("expected arg type or start of arg list"));
+	        throw option_language_error(std::string(
+                        "expected arg type or start of arg list"));
             break;
         }
 
-        continue;
-      }
-      if (state == ARGLIST) {
+        break;
+      case ARGLIST:
         if (!has_input) {
-	  throw option_language_error(std::string("input ended in arg list"));
+	      throw option_language_error(std::string(
+                      "input ended in arg list"));
         }
 
         switch (ch) {
@@ -405,52 +415,54 @@ namespace util {
 
             break;
           case ']':
-            opt.data_type = Data_Prop::STRING; // string is default data type of option arguments
+            opt.data_type = Data_Prop::STRING;
             state = DONE;
 
             break;
           default:
-	    throw option_language_error(std::string("expected arg type or end of arg list"));
+	        throw option_language_error(std::string(
+                        "expected arg type or end of arg list"));
             break;
         }
 
-        continue;
-      }
-      if (state == ARGLIST_END) {
+        break;
+      case ARGLIST_END:
         if (!has_input) {
-	  throw option_language_error(std::string("input ended before arg list finished"));
+	      throw option_language_error(std::string(
+                      "input ended before arg list finished"));
         }
 
         if (ch == ']') {
           state = DONE;
         }
         else {
-	  throw option_language_error(std::string("expected ']' to conclude arg list"));
+	      throw option_language_error(std::string(
+                      "expected ']' to conclude arg list"));
         }
 
-        continue;
-      }
-      if (state == DONE) {
+        break;
+      case DONE:
         if (has_input) {
-	  throw option_language_error(std::string("input found after option spec parsed"));
+          throw option_language_error(std::string("input found after option spec parsed"));
         }
         else {
           if (handles.empty()) {
-	    throw option_language_error(std::string("no handles found in option spec"));
+            throw option_language_error(std::string("no handles found in option spec"));
           }
 
           if (name.empty()) {
-	    std::string& maybe_name = handles.back();
-	    std::string::size_type ind = 0;
+            std::string& maybe_name = handles.back();
+            std::string::size_type ind = 0;
+            
             if (isalpha(maybe_name[0]) || isdigit(maybe_name[0]) || maybe_name[0] == '_') {
-	      ind = 0;
-	    }
-	    else if (isalpha(maybe_name[1]) || isdigit(maybe_name[1]) || maybe_name[1] == '_') {
-	      ind = 1;
-	    }
-	    else {
-	      ind = 2;
-	    }
+	          ind = 0;
+	        }
+	        else if (isalpha(maybe_name[1]) || isdigit(maybe_name[1]) || maybe_name[1] == '_') {
+	          ind = 1;
+	        }
+	        else {
+	          ind = 2;
+	        }
 
             if (maybe_name.size() == ind + 1) { // NOTE: this situation should never happen
               throw option_language_error(std::string("handle minus prefix is the empty string"));
@@ -502,11 +514,9 @@ namespace util {
           }
         }
 
-        break;
+        return opt;
       }
     }
-
-    return opt;
   }
 
   /*
@@ -521,8 +531,7 @@ namespace util {
     std::string::size_type eq_loc;
     option_t opt;
     std::string args;
-    const std::string default_data = "1"; // TODO move to higher scope
-    std::istringstream strim;
+    const std::string default_data = "1";
 
     for (int i = 0; i < argc; ++i) { // loop over all the words in argument list
       std::string handle = argv[i];
