@@ -3,6 +3,10 @@
 #include <sstream>
 #include <cctype>
 
+#define IS_NAME(ch) (isalpha(ch) || isdigit(ch) || ch == '_')
+
+#define IS_PREFIX(ch) (ch == '-' || ch == ':' || ch == '/' || ch == '+' || ch == '.')
+
 namespace util {
   namespace config_constants {
     struct case_sensitive_t {};
@@ -20,7 +24,9 @@ namespace util {
    * retrieve an option argument, returning d if the option
    * not found
    */
-  const std::string opt_info::arg(const std::string& name, const std::string& d) {
+  const std::string opt_info::arg(const std::string& name,
+                                  const std::string& d) {
+
     opt_data_t::const_iterator data = opt_data.find(name);
 
     if (data == opt_data.cend()) {
@@ -100,7 +106,9 @@ namespace util {
    *
    * default: true
    */
-  void opt_parser::set(const config_constants::error_if_unknown_t& c, bool val) {
+  void opt_parser::set(const config_constants::error_if_unknown_t& c,
+                       bool val) {
+
     is_error_unknown_enabled = val;
   }
 
@@ -114,15 +122,15 @@ namespace util {
   option_t opt_parser::option(const std::string& spec,
                               const std::string& name) {
 
-    enum Option_State { MOD, NONE, END_PREFIX, PLUS_PREFIX, MINUS_PREFIX,
-                        NAME, NUMBER, EQ, ARG, ARGLIST, ARGLIST_END,
-                        DONE } state = MOD;
+    enum Option_State { MOD, MOD_FN, MOD_ARG, MOD_END, NONE, PREFIX_END,
+                        PLUS_PREFIX, MINUS_PREFIX, NAME, NUMBER, EQ,
+                        ARG, ARGLIST, ARGLIST_END, DONE } state = MOD;
 
     option_t opt;
     std::vector<std::string> handles;
     std::ostringstream buf;
-
     bool has_input = true;
+    bool forward_char = false;
     std::string::size_type index = 0; // current spec index
     char ch;                          // current spec character
 
@@ -131,17 +139,82 @@ namespace util {
      * which is returned at the end of the switch case/DONE
      */
     while (true) {
-      if (index >= spec.size()) {
-        has_input = false;
+      if (forward_char) {
+        forward_char = false;
       }
       else {
-        ch = spec[index];
+        if (index >= spec.size()) {
+          has_input = false;
+        }
+        else {
+          ch = spec[index];
+        }
+
+        index++;
       }
-      index++;
 
       /* execute code on the state of the option parser */
       switch(state) {
       case MOD:
+        if (!has_input) {
+          state = DONE;
+
+          break;
+        }
+
+        if (ch == '[') {
+          state = MOD_FN;
+        }
+        else {
+          forward_char = true;
+
+          state = NONE;
+        }
+
+        break;
+      case MOD_FN:
+        if (!has_input) {
+          throw option_language_error(std::string("input ended before parsing finished"));
+        }
+
+        switch (ch) {
+          case '&':
+            opt.mod = Mod_Prop::SUB;
+            state = MOD_END;
+
+            break;
+          case '<':
+            throw option_language_error(std::string("unimplemented modifier"));
+            state = MOD_ARG;
+            opt.mod = Mod_Prop::BEFORE;
+            break;
+          case '>':
+            throw option_language_error(std::string("unimplemented modifier"));
+            state = MOD_ARG;
+            opt.mod = Mod_Prop::AFTER;
+            break;
+          case '!':
+            throw option_language_error(std::string("unimplemented modifier"));
+            state = MOD_ARG;
+            opt.mod = Mod_Prop::NOT_WITH;
+            break;
+        }
+
+        break;
+      case MOD_ARG:
+      case MOD_END:
+        if (!has_input) {
+          throw option_language_error(std::string("input ended before parsing finished"));
+        }
+
+        if (ch == ']') {
+          state = NONE;
+        }
+        else {
+          throw option_language_error(std::string("expected ']' character"));
+        }
+
+        break;
       case NONE:
         if (!has_input) {
           state = DONE;
@@ -153,7 +226,7 @@ namespace util {
           case '/':
           case '.':
           case ':':
-            state = END_PREFIX;
+            state = PREFIX_END;
 
             break;
           case '+':
@@ -184,7 +257,7 @@ namespace util {
         }
 
         if (ch == '-') {
-          state = END_PREFIX;
+          state = PREFIX_END;
         }
         else if (isalpha(ch) || isdigit(ch) || ch == '_') {
           state = NAME;
@@ -202,7 +275,7 @@ namespace util {
         }
 
         if (ch == '+') {
-          state = END_PREFIX;
+          state = PREFIX_END;
         }
         else if (isdigit(ch) || isalpha(ch) || ch == '_') {
           state = NAME;
@@ -212,7 +285,7 @@ namespace util {
         }
 
         break;
-      case END_PREFIX:
+      case PREFIX_END:
         if (!has_input) {
 	      throw option_language_error(std::string("input ended before hande complete"));
         }

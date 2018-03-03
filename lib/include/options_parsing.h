@@ -27,6 +27,7 @@ namespace util {
     extern const error_if_unknown_t error_unknown;
   }
 
+  enum class Mod_Prop { NONE, BEFORE, AFTER, SUB, NOT_WITH };
   enum class Num_Prop { ZERO_ONE, ZERO_MANY };
   enum class Assign_Prop { NO_ASSIGN, EQ_REQUIRED, EQ_MAYBE, EQ_NEVER };
   enum class Collect_Prop { SCALAR, LIST };
@@ -34,11 +35,14 @@ namespace util {
 
   struct option_t {
     public:
-      option_t() : number(Num_Prop::ZERO_ONE),
+      option_t() : mod(Mod_Prop::NONE),
+                   number(Num_Prop::ZERO_ONE),
                    assignment(Assign_Prop::NO_ASSIGN),
                    collection(Collect_Prop::SCALAR),
                    data_type(Data_Prop::STRING) {}
 
+      Mod_Prop mod;
+      std::string mod_arg;
       Num_Prop number;
       Assign_Prop assignment;
       Collect_Prop collection;
