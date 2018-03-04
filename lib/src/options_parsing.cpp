@@ -236,6 +236,8 @@ namespace util {
              */
             if (is_subcommand_enabled) {
               opt.mod = Mod_Prop::SUB;
+
+              opt.mod_count++;
             }
             state = MOD_END;
 
@@ -662,6 +664,17 @@ namespace util {
     option_t opt;
     std::string args;
     const std::string default_data = "1";
+
+    /* 
+     * this is the only option_language_error thrown in the parse
+     * member function because calling this function is the only way
+     * to signify the end of option declarations. as stated in a
+     * previous comment, it is an error for subcommands to be enabled
+     * but not declared by calls to option()
+     */
+    if (is_subcommand_enabled && mod_count == 0) {
+      throw option_language_error(std::string("no subcommands declared"));
+    }
 
     for (int i = 0; i < argc; ++i) { // loop over all the words in argument list
       std::string handle = argv[i];
