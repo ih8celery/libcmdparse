@@ -189,6 +189,7 @@ namespace util {
      * which is returned at the end of the switch case/DONE
      */
     while (true) {
+      // process next character {
       if (forward_char) {
         forward_char = false;
       }
@@ -202,6 +203,7 @@ namespace util {
 
         index++;
       }
+      // }
 
       /* execute code on the state of the option parser */
       switch(state) {
@@ -229,7 +231,12 @@ namespace util {
 
         switch (ch) {
           case '&':
-            opt.mod = Mod_Prop::SUB;
+            /* 
+             * declaring an option as subcommand has no effect if setting not enabled
+             */
+            if (is_subcommand_enabled) {
+              opt.mod = Mod_Prop::SUB;
+            }
             state = MOD_END;
 
             break;
