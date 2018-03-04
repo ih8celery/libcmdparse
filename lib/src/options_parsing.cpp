@@ -84,9 +84,18 @@ namespace util {
    *   4. the first invalid or incomplete option causes parsing to fail
    *
    * default: false
+   *
+   * NOTE: "BSD-style" options conflict with subcommands, so enabling
+   *   this setting implicitly disables subcommands
    */
   void opt_parser::set(const config_constants::bsd_opt_t& c, bool val) {
-    is_bsd_opt_enabled = val;
+    if (this->empty()) {
+      is_bsd_opt_enabled = val;
+      
+      if (val) {
+        is_subcommand_enabled = false;
+      }
+    }
   }
 
   /*
@@ -96,9 +105,18 @@ namespace util {
    * prefix
    *
    * default: false
+   *
+   * NOTE: "merged" options conflict with subcommands, so enabling
+   *   this setting implicitly disables subcommands
    */
   void opt_parser::set(const config_constants::merged_opt_t& c, bool val) {
-    is_merged_opt_enabled = val;
+    if (this->empty()) {
+      is_merged_opt_enabled = val;
+
+      if (val) {
+        is_subcommand_enabled = false;
+      }
+    }
   }
 
   /*
@@ -111,7 +129,9 @@ namespace util {
   void opt_parser::set(const config_constants::error_if_unknown_t& c,
                        bool val) {
 
-    is_error_unknown_enabled = val;
+    if (this->empty()) {
+      is_error_unknown_enabled = val;
+    }
   }
 
   /*
@@ -119,18 +139,29 @@ namespace util {
    * may not support subcommands and merged options or bsd options
    * simultaneously. a subcommand may be any valid handle, but it must
    * appear in argv[0]. if subcommands are enabled, it is an error
-   * not to provide one. subcommands may still be declared in the
+   * NOT to provide one. subcommands may still be declared in the
    * option spec, but will be ignored if this setting is false.
    *
    * default: false
+   *
+   * NOTE: subcommands conflict with "BSD-style" and "merged" options,
+   *   so enabling this setting implicitly disables those settings
    */
   void opt_parser::set(const config_constants::subcommand_t& c, bool val) {
-    is_subcommand_enabled = true;
+    if (this->empty()) {
+      is_subcommand_enabled = val;
+
+      if (val) {
+        is_merged_opt_enabled = false;
+        is_bsd_opt_enabled    = false;
+      }
+    }
   }
 
   bool opt_parser::empty() {
     return name_set.empty();
   }
+  
   /*
    * declare an option to the parser where option name is
    * the second argument to the function
