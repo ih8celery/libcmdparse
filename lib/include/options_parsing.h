@@ -101,6 +101,8 @@ namespace util {
       void set(const config_constants::error_if_unknown_t&, bool = true);
       void set(const config_constants::subcommand_t&, bool = true);
 
+      inline bool empty();
+
       std::pair<bool, std::string>
         get_opt(std::string spec, char ** &argv, int argc);
 
@@ -135,6 +137,7 @@ namespace util {
       bool is_merged_opt_enabled;
       bool is_error_unknown_enabled;
       bool is_subcommand_enabled;
+      size_t mod_count;
   };
 
   class parse_error : std::exception {

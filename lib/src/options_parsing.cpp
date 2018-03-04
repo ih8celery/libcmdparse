@@ -128,6 +128,9 @@ namespace util {
     is_subcommand_enabled = true;
   }
 
+  bool opt_parser::empty() {
+    return name_set.empty();
+  }
   /*
    * declare an option to the parser where option name is
    * the second argument to the function
