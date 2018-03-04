@@ -237,7 +237,7 @@ namespace util {
             if (is_subcommand_enabled) {
               opt.mod = Mod_Prop::SUB;
 
-              opt.mod_count++;
+              mod_count++;
             }
             state = MOD_END;
 
@@ -676,13 +676,20 @@ namespace util {
       throw option_language_error(std::string("no subcommands declared"));
     }
 
-    for (int i = 0; i < argc; ++i) { // loop over all the words in argument list
+    /* loop over all the words in argv */
+    for (int i = 0; i < argc; ++i) {
       std::string handle = argv[i];
       eq_loc = handle.find_first_of('=');
       std::map<std::string, option_t>::const_iterator iter;
 
+      // TODO if not enabled, may not be a subcommand
+      // TODO else if bsd opts enabled, argv[0] may be
+      // TODO else if merged opts enabled, argv[0] may be
+      // TODO after argv[0], no opts interpreted as bsd or merged &&
+      // no subcommand options allowed
+
       // get the handle
-      if (eq_loc == std::string::npos) { // no equals sign, so entire word is handle
+      if (eq_loc == std::string::npos) {
         if (is_case_sensitive) {
           iter = handle_map.find(handle);
         }
@@ -691,8 +698,15 @@ namespace util {
           iter = handle_map.find(handle);
         }
       }
-      else { // found equals sign, so only the substring up to the equals sign 
+      else {
         iter = handle_map.find(handle.substr(0, eq_loc));
+
+        if (i == 0 && (is_subcommand_enabled
+            || is_bsd_opt_enabled
+            || is_merged_opt_enabled)) {
+        
+          throw parse_error(std::string("special options may not take arguments"));
+        }
       }
  
       // handle is unknown, so it is either a malformed option or a non-option
@@ -705,26 +719,36 @@ namespace util {
           continue;
         }
       }
+      // handle seems to be an option
       else {
         opt = iter->second;
 
+        if (i != 0 && opt.mod == Mod_Prop::SUB) {
+          throw parse_error(std::string("subcommand found after first argument"));
+        }
+
         // compare option requirements with data and insert into opt_data mmap
-        if (opt.number == Num_Prop::ZERO_ONE && info.opt_data.find(opt.name) != info.opt_data.cend()) {
-          throw parse_error(std::string("no-repeat option with handle '") + handle + "' found more than once");
+        if (opt.number == Num_Prop::ZERO_ONE
+            && info.opt_data.find(opt.name) != info.opt_data.cend()) {
+          throw parse_error(std::string("no-repeat option with handle '")
+              + handle + "' found more than once");
         }
         else {
           if (opt.assignment == Assign_Prop::NO_ASSIGN) {
             if (eq_loc == std::string::npos) {
               info.opt_data.insert(std::make_pair(opt.name, default_data));
-              continue;
             }
             else {
-              throw parse_error(std::string("option with handle '") + handle + "' should not have an argument");
+              throw parse_error(std::string("option with handle '")
+                  + handle + "' should not have an argument");
             }
+
+            continue;
           }
           else if (opt.assignment == Assign_Prop::EQ_REQUIRED) {
             if (eq_loc == std::string::npos) {
-              throw parse_error(std::string("option with handle '") + handle + "' is missing equals sign");
+              throw parse_error(std::string("option with handle '")
+                  + handle + "' is missing equals sign");
             }
             else {
               args = handle.substr(eq_loc+1);
@@ -736,7 +760,8 @@ namespace util {
                 args = argv[i];  
               }
               else {
-                throw parse_error(std::string("option with handle '") + handle + "' missing an argument");
+                throw parse_error(std::string("option with handle '")
+                    + handle + "' missing an argument");
               }
             }
             else {
@@ -749,15 +774,17 @@ namespace util {
                 args = argv[i];
               }
               else {
-                throw parse_error(std::string("option with handle '") + handle + "' missing an argument");
+                throw parse_error(std::string("option with handle '")
+                    + handle + "' missing an argument");
               }
             }
             else {
-              throw parse_error(std::string("option with handle '") + handle + "' should not use an equals sign");
+              throw parse_error(std::string("option with handle '")
+                  + handle + "' should not use an equals sign");
             }
           }
 
-    bool parse_failed(false);
+          bool parse_failed(false);
           enum { START, PRE, DOT, POST } state = START;
           if (opt.collection == Collect_Prop::SCALAR) {
               if (info.opt_data.find(opt.name) == info.opt_data.cend()) {
@@ -812,7 +839,7 @@ namespace util {
             while (std::getline(src, data, ',')) {
               if (opt.data_type == Data_Prop::STRING);
               else if (opt.data_type == Data_Prop::INTEGER) {
-    for (const char& ch : data) {
+                for (const char& ch : data) {
                   if (!isdigit(ch)) {
                     parse_failed = true;
                     break;
