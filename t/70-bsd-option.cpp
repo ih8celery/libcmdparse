@@ -1,7 +1,7 @@
 /*
- * 60-merged-option.cpp
- *
- * test the use of merged options
+ * @file 70-bsd-option.cpp
+ * @author Adam Marshall (ih8celery)
+ * @brief test the use of bsd options
  */
 
 #define WANT_TEST_EXTRAS

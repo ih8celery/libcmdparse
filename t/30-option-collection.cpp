@@ -1,8 +1,8 @@
 /*
- * option-collection.cpp
- *
- * test definition of option_t::collection by calls to
- * option_parser::option, and the parsing of options
+ * @file option-collection.cpp
+ * @author Adam Marshall (ih8celery)
+ * @brief test definition of option_t::collection by calls to \
+ * option_parser::option, and the parsing of options \
  * created thereby
  */
 

@@ -1,8 +1,8 @@
 /*
- * option-assignment.cpp
- *
- * test the definition of the option_t::assignment property by
- * option declarations, and the parsing of options where that
+ * @file option-assignment.cpp
+ * @author Adam Marshall (ih8celery)
+ * @brief test the definition of the option_t::assignment property by \
+ * option declarations, and the parsing of options where that \
  * property is of interest
  */
 

@@ -1,7 +1,7 @@
 /*
- * option-number.cpp
- *
- * test the number property of option selected during 
+ * @file option-number.cpp
+ * @author Adam Marshall (ih8celery)
+ * @brief test the number property of option selected during \
  * calls to opt_parser::option
  */
 

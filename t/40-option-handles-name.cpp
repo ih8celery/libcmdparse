@@ -1,9 +1,9 @@
 /*
- * option-handles-names.cpp
- *
- * test the creation of handles to options and the
- * selection of option_t::name during calls to
- * option_parser::option; also test the parsing of
+ * @file option-handles-names.cpp
+ * @author Adam Marshall (ih8celery)
+ * @brief test the creation of handles to options and the \
+ * selection of option_t::name during calls to \
+ * option_parser::option; also test the parsing of \
  * the options
  */
 
