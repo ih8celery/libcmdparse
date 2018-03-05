@@ -586,16 +586,19 @@ namespace util {
             std::string& maybe_name = handles.back();
             std::string::size_type ind = 0;
             
-            if (isalpha(maybe_name[0]) || isdigit(maybe_name[0]) || maybe_name[0] == '_') {
-            ind = 0;
-          }
-          else if (isalpha(maybe_name[1]) || isdigit(maybe_name[1]) || maybe_name[1] == '_') {
-            ind = 1;
-          }
-          else {
-            ind = 2;
-          }
-
+            if (isalpha(maybe_name[0])
+                || isdigit(maybe_name[0])
+                || maybe_name[0] == '_') {
+              
+              ind = 0;
+            }
+            else if (isalpha(maybe_name[1]) || isdigit(maybe_name[1]) || maybe_name[1] == '_') {
+              ind = 1;
+            }
+            else {
+              ind = 2;
+            }
+          
             if (maybe_name.size() == ind + 1) { // NOTE: this situation should never happen
               throw option_language_error(std::string("handle minus prefix is the empty string"));
             }
@@ -682,19 +685,84 @@ namespace util {
       eq_loc = handle.find_first_of('=');
       std::map<std::string, option_t>::const_iterator iter;
 
-      // TODO if not enabled, may not be a subcommand
-      // TODO else if bsd opts enabled, argv[0] may be
-      // TODO else if merged opts enabled, argv[0] may be
-      // TODO after argv[0], no opts interpreted as bsd or merged &&
-      // no subcommand options allowed
-
       // get the handle
       if (eq_loc == std::string::npos) {
-        if (is_case_sensitive) {
+        if (i == 0 && (is_bsd_opt_enabled || is_merged_opt_enabled)) {
+          bool prefix_done = false;
+          bool accepted_first_special = false;
+
+          char mini_handle;
+
+          for (int j = 0; j < handle.size(); ++j) {
+            // eliminate any prefix characters
+            while (j < 2 && !prefix_done) {
+              prefix_done = !(IS_PREFIX(handle[j]));
+
+              ++j;
+
+              if (!prefix_done && !is_merged_opt_enabled) {
+                throw parse_error(std::string("bsd-style options may not use a prefix"));
+              }
+
+              if (prefix_done) {
+                j--;
+                break;
+              }
+            }
+
+            /*
+             * test this char; if it is not a handle, error
+             * if it is a handle, record it
+             */
+            if (is_case_sensitive) {
+              mini_handle = handle[j];
+            }
+            else {
+              mini_handle = tolower(handle[j]);
+            }
+
+            iter = handle_map.find(std::string(1, mini_handle));
+            opt  = iter->second;
+
+            if (iter == handle_map.cend()) {
+              if (accepted_first_special) {
+                throw parse_error(std::string("all or none of the")
+                    + " characters in the first argument must special");
+              }
+              else {
+                // abandon processing if the first char is not special
+                break; 
+              }
+            }
+            else {
+              if (opt.assignment == Assign_Prop::NO_ASSIGN) {
+                // option repeated too many times
+                if (opt.number == Num_Prop::ZERO_ONE
+                    && info.opt_data.find(opt.name) != info.opt_data.cend()) {
+
+                  throw parse_error(std::string("option repeated more than allowed"));
+                }
+
+                info.opt_data.insert(std::make_pair(opt.name, default_data));
+                accepted_first_special = true;
+              }
+              else {
+                throw parse_error(std::string("cannot assign to a bsd ")
+                    + "or merged option");
+              }
+            }
+          }
+
+          if (accepted_first_special)
+            continue;
+
           iter = handle_map.find(handle);
         }
         else {
-          // TODO use lowercase
+          if (!is_case_sensitive){
+            // TODO use lowercase
+          }
+
           iter = handle_map.find(handle);
         }
       }
