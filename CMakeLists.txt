@@ -3,8 +3,10 @@ cmake_minimum_required (VERSION 3.0)
 project (Optparse LANGUAGES CXX)
 
 set (CMAKE_CXX_STANDARD 11)
-set (CUSTOM_TEST_DRIVER "${CMAKE_CURRENT_LIST_DIR}/lib/tap")
-set (PROJECT_HEADERS "${CMAKE_CURRENT_LIST_DIR}/lib/include")
+set (HOME ${CMAKE_CURRENT_LIST_DIR})
+set (CUSTOM_TEST_DRIVER "${HOME}/lib/tap")
+set (PROJECT_HEADERS "${HOME}/lib/include")
+set (CTAGS_FILE "${HOME}/tags")
 
 enable_testing ()
 
@@ -12,6 +14,8 @@ include_directories (${PROJECT_HEADERS})
 
 add_subdirectory (lib/src)
 add_subdirectory (t)
+
+add_custom_target (tags COMMAND ctags "." WORKING_DIRECTORY ${HOME})
 
 install (FILES "${PROJECT_HEADERS}/options_parsing.h"
          DESTINATION include)
