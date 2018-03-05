@@ -16,34 +16,40 @@ int main() {
 
   p.set(config_constants::merged_opt);
 
-  p.option("d?", "due");
+  p.option("d|-due?", "due");
   p.option("a", "awe");
+  p.option("--afd", "AFD");
   auto opt = p.option("f*", "file");
 
-  char ** argv = new char*[2];
+  plan(6);
+
+  char ** argv = new char*[6];
 
   argv[0] = (char *)"--afd";
   argv[1] = (char *)"f";
+  argv[2] = (char *)":d";
+  argv[3] = (char *)"-due";
+  argv[4] = (char *)"--afd";
+  argv[5] = (char *)"--afd";
 
-  opt_info info;
-  
-  try {
-    info = p.parse(argv, 2);
-  }
-  catch (const parse_error& e) {
-    std::cout << e.what() << std::endl;
-
-    return 0;
-  }
-
-  delete [] argv;
-
-  plan(4);
+  opt_info info = p.parse(argv, 2);
 
   ok(info.has("file"), "found file argument");
   ok(info.count("file") == 2, "file argument twice");
   ok(info.count("awe") == 1, "found awe argument once");
   ok(info.count("due") == 1, "found due argument once");
+
+  argv += 2;
+  TRY_NOT_OK(p.parse(argv, 2), "merged option may not be repeated excessively");
+
+  argv += 2;
+  info = p.parse(argv, 2);
+
+  ok(info.count("AFD"), "option named AFD found once");
+
+  argv -= 4;
+
+  delete [] argv;
 
   done_testing();
 
