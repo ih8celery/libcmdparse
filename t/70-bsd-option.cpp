@@ -17,31 +17,30 @@ int main() {
   p.set(config_constants::bsd_opt);
 
   p.option("d?", "due");
-  p.option("a", "awe");
+  p.option("a|-awe", "awe");
   p.option("f*", "file");
 
-  char ** argv = new char*;
+  char ** argv = new char*[4];
 
   argv[0] = (char *)"afd";
+  argv[1] = (char *)"f";
+  argv[2] = (char *)"af";
+  argv[3] = (char *)"-awe";
 
-  opt_info info;
-  
-  try {
-    info = p.parse(argv, 1);
-  }
-  catch (const parse_error& e) {
-    std::cout << e.what() << std::endl;
+  plan(5);
 
-    return 0;
-  }
-
-  delete argv;
-
-  plan(3);
+  opt_info info = p.parse(argv, 2);
 
   ok(info.has("file"), "found file argument");
+  ok(info.count("file") == 2, "found file argument twice");
   ok(info.count("awe") == 1, "found awe argument once");
   ok(info.count("due") == 1, "found due argument once");
+
+  argv += 2;
+  TRY_NOT_OK(p.parse(argv, 2), "bsd options may not be excessively repeated");
+  argv -= 2;
+
+  delete [] argv;
 
   done_testing();
 
