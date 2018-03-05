@@ -21,6 +21,9 @@ target_link_libraries (merged tap++ optparse)
 add_executable (bsd "70-bsd-option.cpp")
 target_link_libraries (bsd tap++ optparse)
 
+add_executable (subcommand "80-subcommands.cpp")
+target_link_libraries (subcommand tap++ optparse)
+
 set (CUSTOM_TEST_EXECUTABLES 
   "${EXECUTABLE_OUTPUT_PATH}/number" 
   "${EXECUTABLE_OUTPUT_PATH}/assignment" 
@@ -29,6 +32,7 @@ set (CUSTOM_TEST_EXECUTABLES
   "${EXECUTABLE_OUTPUT_PATH}/data"
   "${EXECUTABLE_OUTPUT_PATH}/merged"
   "${EXECUTABLE_OUTPUT_PATH}/bsd"
+  "${EXECUTABLE_OUTPUT_PATH}/subcommand"
   )
 
 add_custom_target (debug
@@ -41,3 +45,4 @@ add_test (NAME test_handles COMMAND handles)
 add_test (NAME test_data COMMAND data)
 add_test (NAME test_merged COMMAND merged)
 add_test (NAME test_bsd COMMAND bsd)
+add_test (NAME test_sub COMMAND subcommand)
