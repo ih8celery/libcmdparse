@@ -10,3 +10,6 @@ t/handles
 t/merged
 t/bsd
 build/
+doc/man
+doc/latex
+doc/html
