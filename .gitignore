@@ -7,4 +7,6 @@ t/sanity
 t/collection
 t/data
 t/handles
+t/merged
+t/bsd
 build/
