@@ -7,7 +7,7 @@
 #include "options_parsing.h"
 #include <tap++.h>
 
-#define ARGC 7
+constexpr int ARGC = 7;
 
 using namespace TAP;
 
