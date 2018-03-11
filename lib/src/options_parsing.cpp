@@ -6,7 +6,6 @@
  * \brief parse command line arguments/options
  */
 #include "options_parsing.h"
-#include <iostream>
 #include <sstream>
 #include <cctype>
 
