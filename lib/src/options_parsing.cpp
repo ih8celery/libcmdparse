@@ -15,13 +15,13 @@
 #define IS_PREFIX(ch) (ch == '-' || ch == ':' || ch == '/' || ch == '+' || ch == '.')
 
 namespace util {
-  /*
-   * retrieve an option argument, returning d if the option
-   * not found
-   */
-  std::string opt_info::arg(const std::string& name,
-                                  const std::string& d) {
+  option_t::option_t() : mod(Mod_Prop::NONE),
+                         number(Num_Prop::ZERO_ONE),
+                         assignment(Assign_Prop::NO_ASSIGN),
+                         collection(Collect_Prop::SCALAR),
+                         data_type(Data_Prop::STRING) {}
 
+  std::string opt_info::arg(const std::string& name, const std::string& d) {
     opt_data_t::const_iterator data = opt_data.find(name);
 
     if (data == opt_data.cend()) {
@@ -31,43 +31,28 @@ namespace util {
     return data->second;
   }
 
-  /*
-   * return a range of iterators denoting the values attached to an option 
-   */
-  std::pair<opt_data_t::const_iterator, opt_data_t::const_iterator>
-  opt_info::list(const std::string& name) {
-    
-    const std::pair<opt_data_t::const_iterator,
-                    opt_data_t::const_iterator>
+  RangePair opt_info::list(const std::string& name) {
+    const std::pair<opt_data_t::const_iterator, opt_data_t::const_iterator>
       rng = opt_data.equal_range(name);
 
     return rng;
   }
 
-  /* 
-   * count the occurrences of an option. except for count and list options, 
-   * the count will be 1 if option is present and 0 if not
-   */
   size_t opt_info::count(const std::string& name) {
     return opt_data.count(name);
   }
 
-  /* predicate to check whether an option is present in the result of parsing */
   bool opt_info::has(const std::string& name) {
     return (opt_data.find(name) != opt_data.cend());
   }
 
-  bool opt_parser::empty() const {
-    return name_set.empty();
-  }
-  
-  /*
-   * declare an option to the parser where option name is
-   * the second argument to the function
-   * see doc/option/spec.md for full description of options
-   *
-   * throws an option_language_error if something goes wrong
-   */
+  opt_parser::opt_parser() : is_case_sensitive(true),
+                             is_bsd_opt_enabled(false),
+                             is_merged_opt_enabled(false),
+                             is_subcommand_enabled(false),
+                             is_error_unknown_enabled(true),
+                             is_mod_found(false) {}
+
   option_t opt_parser::option(const std::string& spec,
                               const std::string& name) {
 
@@ -553,13 +538,6 @@ namespace util {
     }
   }
 
-  /*
-   * extract options and non-options from argv into opt_info
-   * object. any options or data belonging to options is removed from
-   * argv and replaced with nullptr
-   *
-   * throws a parse_error if something goes wrong
-   */
   opt_info opt_parser::parse(char ** &argv, int argc) {
     opt_info info;
     std::string::size_type eq_loc;
@@ -567,7 +545,7 @@ namespace util {
     std::string args;
     const std::string default_data = "1";
 
-    /* 
+    /** 
      * this is the only option_language_error thrown in the parse
      * member function because calling this function is the only way
      * to signify the end of option declarations. as stated in a
