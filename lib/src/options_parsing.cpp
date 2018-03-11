@@ -8,20 +8,6 @@
 #define IS_PREFIX(ch) (ch == '-' || ch == ':' || ch == '/' || ch == '+' || ch == '.')
 
 namespace util {
-  namespace config_constants {
-    struct case_sensitive_t {};
-    struct bsd_opt_t {};
-    struct merged_opt_t {};
-    struct error_if_unknown_t {};
-    struct subcommand_t {};
-
-    const case_sensitive_t case_sensitive = case_sensitive_t();
-    const bsd_opt_t bsd_opt = bsd_opt_t();
-    const merged_opt_t merged_opt = merged_opt_t();
-    const error_if_unknown_t error_unknown = error_if_unknown_t();
-    const subcommand_t sub = subcommand_t();
-  }
-
   /*
    * retrieve an option argument, returning d if the option
    * not found
@@ -64,101 +50,7 @@ namespace util {
     return (opt_data.find(name) != opt_data.cend());
   }
 
-  /* 
-   * configure opt_parser's case sensitivity when parsing ARGV.
-   * case sensitivity of option names and stored handles is NOT affected
-   *
-   * default: true
-   */
-  void opt_parser::set(const config_constants::case_sensitive_t& c, bool val) {
-    is_case_sensitive = val;
-  }
-
-  /* 
-   * configure opt_parser's ability to detect bsd-style options in argv.
-   * zero or more bsd-style options may then appear at the beginning of argv,
-   * under the following conditions:
-   *   1. option prefixes (-, --, +, etc) are not allowed in these options
-   *   2. option handles must be exactly one letter long without a prefix
-   *   3. options must be concatenated into one string, stored in argv[0]
-   *   4. the first invalid or incomplete option causes parsing to fail
-   *
-   * default: false
-   *
-   * NOTE: "BSD-style" options conflict with subcommands, so enabling
-   *   this setting implicitly disables subcommands
-   */
-  void opt_parser::set(const config_constants::bsd_opt_t& c, bool val) {
-    if (this->empty()) {
-      is_bsd_opt_enabled = val;
-      
-      if (val) {
-        is_subcommand_enabled = false;
-      }
-    }
-  }
-
-  /*
-   * configure opt_parser's ability to detect merged options in argv.
-   * merged options are identical to bsd-style options except in one
-   * respect: the first option detected in argv[0] must include its
-   * prefix
-   *
-   * default: false
-   *
-   * NOTE: "merged" options conflict with subcommands, so enabling
-   *   this setting implicitly disables subcommands
-   */
-  void opt_parser::set(const config_constants::merged_opt_t& c, bool val) {
-    if (this->empty()) {
-      is_merged_opt_enabled = val;
-
-      if (val) {
-        is_subcommand_enabled = false;
-      }
-    }
-  }
-
-  /*
-   * configure opt_parser's response to a char* in argv that resembles
-   * a valid option but is not known to the parser. true causes error
-   * to be thrown
-   *
-   * default: true
-   */
-  void opt_parser::set(const config_constants::error_if_unknown_t& c,
-                       bool val) {
-
-    if (this->empty()) {
-      is_error_unknown_enabled = val;
-    }
-  }
-
-  /*
-   * configure opt_parser's ability to detect subcommands. opt_parser
-   * may not support subcommands and merged options or bsd options
-   * simultaneously. a subcommand may be any valid handle, but it must
-   * appear in argv[0]. if subcommands are enabled, it is an error
-   * NOT to provide one. subcommands may still be declared in the
-   * option spec, but will be ignored if this setting is false.
-   *
-   * default: false
-   *
-   * NOTE: subcommands conflict with "BSD-style" and "merged" options,
-   *   so enabling this setting implicitly disables those settings
-   */
-  void opt_parser::set(const config_constants::subcommand_t& c, bool val) {
-    if (this->empty()) {
-      is_subcommand_enabled = val;
-
-      if (val) {
-        is_merged_opt_enabled = false;
-        is_bsd_opt_enabled    = false;
-      }
-    }
-  }
-
-  bool opt_parser::empty() {
+  bool opt_parser::empty() const {
     return name_set.empty();
   }
   
