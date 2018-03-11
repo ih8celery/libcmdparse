@@ -737,8 +737,8 @@ namespace util {
           }
 
           bool parse_failed(false);
-          enum class FLOAT_STATE { START, PRE, DOT, POST };
-          FLOAT_STATE state = FLOAT_STATE::START;
+          enum class DT_STATE { START, LDIGIT, RDIGIT, DOT, END };
+          DT_STATE state = DT_STATE::START;
 
           if (opt.collection == Collect_Prop::SCALAR) {
               if (info.opt_data.find(opt.name) == info.opt_data.cend()) {
@@ -757,16 +757,16 @@ namespace util {
                 }
                 else {
                   for (const char& ch : args) {
-                    if (isdigit(ch) && state == FLOAT_STATE::START) {
-                      state = FLOAT_STATE::PRE;
+                    if (isdigit(ch) && state == DT_STATE::START) {
+                      state = DT_STATE::LDIGIT;
                     }
-                    else if (isdigit(ch) && state == FLOAT_STATE::DOT) {
-                      state = FLOAT_STATE::POST;
+                    else if (isdigit(ch) && state == DT_STATE::DOT) {
+                      state = DT_STATE::RDIGIT;
                     }
-                    else if (ch == '.' && state == FLOAT_STATE::PRE) {
-                      state = FLOAT_STATE::DOT;
+                    else if (ch == '.' && state == DT_STATE::LDIGIT) {
+                      state = DT_STATE::DOT;
                     }
-                    else if (isdigit(ch) && state == FLOAT_STATE::POST) {
+                    else if (isdigit(ch) && (state == DT_STATE::LDIGIT || state == DT_STATE::RDIGIT)) {
                       continue;
                     }
                     else {
@@ -774,7 +774,7 @@ namespace util {
                     }
                   }
 
-                  if (state != FLOAT_STATE::PRE && state != FLOAT_STATE::POST) {
+                  if (state != DT_STATE::RDIGIT && state != DT_STATE::LDIGIT) {
                     throw parse_error(std::string("data '") + args + "' is not a float argument");
                   }
                 }
@@ -805,16 +805,16 @@ namespace util {
               }
               else {
                 for (const char& ch : data) {
-                  if (isdigit(ch) && state == FLOAT_STATE::START) {
-                    state = FLOAT_STATE::PRE;
+                  if (isdigit(ch) && state == DT_STATE::START) {
+                    state = DT_STATE::LDIGIT;
                   }
-                  else if (isdigit(ch) && state == FLOAT_STATE::DOT) {
-                    state = FLOAT_STATE::POST;
+                  else if (isdigit(ch) && state == DT_STATE::DOT) {
+                    state = DT_STATE::RDIGIT;
                   }
-                  else if (ch == '.' && state == FLOAT_STATE::PRE) {
-                    state = FLOAT_STATE::DOT;
+                  else if (ch == '.' && state == DT_STATE::LDIGIT) {
+                    state = DT_STATE::DOT;
                   }
-                  else if (isdigit(ch) && state == FLOAT_STATE::POST) {
+                  else if (isdigit(ch) && (state == DT_STATE::RDIGIT || state == DT_STATE::LDIGIT)) {
                     continue;
                   }
                   else {
@@ -822,7 +822,7 @@ namespace util {
                   }
                 }
 
-                if (state != FLOAT_STATE::PRE && state != FLOAT_STATE::POST) {
+                if (state != DT_STATE::RDIGIT && state != DT_STATE::LDIGIT) {
                   throw parse_error(std::string("data '") + data + "' is not a float argument");
                 }
               }
