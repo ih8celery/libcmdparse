@@ -129,7 +129,7 @@ namespace util {
             if (is_subcommand_enabled) {
               opt.mod = Mod_Prop::SUB;
 
-              mod_count++;
+              is_mod_found = true;
             }
             state = MOD_END;
 
@@ -567,7 +567,7 @@ namespace util {
      * previous comment, it is an error for subcommands to be enabled
      * but not declared by calls to option()
      */
-    if (is_subcommand_enabled && mod_count == 0) {
+    if (is_subcommand_enabled && !is_mod_found) {
       throw option_language_error(std::string("no subcommands declared"));
     }
 

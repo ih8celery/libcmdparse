@@ -91,7 +91,8 @@ namespace util {
                      is_bsd_opt_enabled(false),
                      is_merged_opt_enabled(false),
                      is_subcommand_enabled(false),
-                     is_error_unknown_enabled(true) {}
+                     is_error_unknown_enabled(true),
+                     is_mod_found(false) {}
 
       option_t option(const std::string&, const std::string& = "");
 
@@ -228,7 +229,7 @@ namespace util {
       bool is_merged_opt_enabled;
       bool is_error_unknown_enabled;
       bool is_subcommand_enabled;
-      size_t mod_count;
+      bool is_mod_found;
   };
 
   class parse_error : std::exception {
