@@ -9,9 +9,20 @@
 #include <sstream>
 #include <cctype>
 
-#define IS_NAME(ch) (isalpha(ch) || isdigit(ch) || ch == '_')
+namespace {
+  inline bool is_prefix_char(char ch) {
+    return (ch == ':' || ch == '.' || ch == '-'
+              || ch == '+' || ch == '/');
+  }
 
-#define IS_PREFIX(ch) (ch == '-' || ch == ':' || ch == '/' || ch == '+' || ch == '.')
+  inline bool is_name_start_char(char ch) {
+    return (isalpha(ch) || isdigit(ch) || ch == '_');
+  }
+
+  inline bool is_name_rest_char(char ch) {
+    return (is_name_start_char(ch) || ch == '-');
+  }
+}
 
 namespace util {
   option_t::option_t() : mod(Mod_Prop::NONE),
@@ -180,7 +191,7 @@ namespace util {
 
             break;
           default:
-            if (isalpha(ch) || isdigit(ch) || ch == '_') {
+            if (is_name_start_char(ch)) {
               state = NAME;
             }
             else {
@@ -201,7 +212,7 @@ namespace util {
         if (ch == '-') {
           state = PREFIX_END;
         }
-        else if (isalpha(ch) || isdigit(ch) || ch == '_') {
+        else if (is_name_start_char(ch)) {
           state = NAME;
         }
         else {
@@ -219,7 +230,7 @@ namespace util {
         if (ch == '+') {
           state = PREFIX_END;
         }
-        else if (isdigit(ch) || isalpha(ch) || ch == '_') {
+        else if (is_name_start_char(ch)) {
           state = NAME;
         }
         else {
@@ -232,7 +243,7 @@ namespace util {
         throw option_language_error(std::string("input ended before hande complete"));
         }
 
-        if (isdigit(ch) || isalpha(ch) || ch == '_') {
+        if (is_name_start_char(ch)) {
           buf << ch;
 
           state = NAME;
@@ -288,7 +299,7 @@ namespace util {
         opt.number = Num_Prop::ZERO_MANY;
         break;
         default:
-          if (isdigit(ch) || isalpha(ch) || ch == '_' || ch == '-') {
+          if (is_name_rest_char(ch)) {
             buf << ch;
           }
           else {
@@ -469,13 +480,10 @@ namespace util {
             std::string& maybe_name = handles.back();
             std::string::size_type ind = 0;
             
-            if (isalpha(maybe_name[0])
-                || isdigit(maybe_name[0])
-                || maybe_name[0] == '_') {
-              
+            if (is_name_start_char(maybe_name[0])) {
               ind = 0;
             }
-            else if (isalpha(maybe_name[1]) || isdigit(maybe_name[1]) || maybe_name[1] == '_') {
+            else if (is_name_start_char(maybe_name[1])) {
               ind = 1;
             }
             else {
@@ -572,7 +580,7 @@ namespace util {
           for (int j = 0; j < handle.size(); ++j) {
             // eliminate any prefix characters
             while (j < 2 && !prefix_done) {
-              prefix_done = !(IS_PREFIX(handle[j]));
+              prefix_done = !(is_prefix_char(handle[j]));
 
               ++j;
 
@@ -655,7 +663,7 @@ namespace util {
  
       // handle is unknown, so it is either a malformed option or a non-option
       if (iter == handle_map.cend()) {
-        if (IS_PREFIX(handle[0]) && is_error_unknown_enabled) {
+        if (is_prefix_char(handle[0]) && is_error_unknown_enabled) {
           throw parse_error(std::string("unknown option with handle: ") + handle); 
         }
         else {
