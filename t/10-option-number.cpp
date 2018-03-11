@@ -1,8 +1,7 @@
-/*
- * @file option-number.cpp
- * @author Adam Marshall (ih8celery)
- * @brief test the number property of option selected during \
- * calls to opt_parser::option
+/**
+ * \file 10-option-number.cpp
+ * \author Adam Marshall (ih8celery)
+ * \brief test the number property of option
  */
 
 #include <tap++.h>

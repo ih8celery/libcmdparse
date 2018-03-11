@@ -1,9 +1,7 @@
-/*
- * @file option-data.cpp
- * @author Adam Marshall (ih8celery)
- * @brief test definition of option_t::data_type by calls to \
- * option_parser::option, and the parsing of options \
- * created thereby
+/**
+ * \file 50-option-data.cpp
+ * \author Adam Marshall (ih8celery)
+ * \brief test definition of option_t::data_type
  */
 
 #include <tap++.h>

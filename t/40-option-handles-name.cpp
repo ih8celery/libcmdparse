@@ -1,10 +1,9 @@
-/*
- * @file option-handles-names.cpp
- * @author Adam Marshall (ih8celery)
- * @brief test the creation of handles to options and the \
- * selection of option_t::name during calls to \
- * option_parser::option; also test the parsing of \
- * the options
+/**
+ * \file 40-option-handles-names.cpp
+ *
+ * \author Adam Marshall (ih8celery)
+ * 
+ * \brief test the creation of handles and option names
  */
 
 #define WANT_TEST_EXTRAS
@@ -16,7 +15,7 @@
 using namespace TAP;
 
 int main () {
-  plan(9);
+  plan(12);
 
   util::opt_parser parser;
   util::option_t opt;
@@ -24,20 +23,21 @@ int main () {
   // definition of option/name
   opt = parser.option("--has-opt*", "name");
   ok(opt.name == "name", "the second argument to option is the name");
-  ok(parser.handle_has_name("--has-opt", "name"), "a handle is a string used to identify the option to use in parsing");
+  ok(parser.handle_has_name("--has-opt", "name"),
+      "a handle is a string used to identify the option to use in parsing");
 
   // extended definition of option/name 
   opt = parser.option("-repeat*", "name");
-  ok(parser.handle_has_name("-repeat", "name"), "option may be specified in multiple calls so long as name is same"); // test name
+  ok(parser.handle_has_name("-repeat", "name"),
+      "option may be specified in multiple calls so long as name is same");
 
-  // TRY repeating handle
-  //TRY(parser.option("-repeat", "other"), "repeated handles are not allowed");
+  TRY_NOT_OK(parser.option("-repeat", "other"),
+      "repeated handles are not allowed");
 
-  // TRY incompatible options
-  //TRY(parser.option("-age=i", "name"), "options with same name must have compatible properties");
+  TRY_NOT_OK(parser.option("-age=i", "name"),
+      "options with same name must have compatible properties");
 
-  // TRY non-word characters in handle name
-  //TRY(parser.option("-!!"), "handles must contain 'word' characters");
+  TRY_NOT_OK(parser.option("-!!"), "handles must contain 'word' characters");
   note("handles may begin with digits, letters, or underscores.");
   note("after the beginning, handles may also contain hyphens");
 

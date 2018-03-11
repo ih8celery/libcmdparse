@@ -1,9 +1,7 @@
-/*
- * @file option-collection.cpp
- * @author Adam Marshall (ih8celery)
- * @brief test definition of option_t::collection by calls to \
- * option_parser::option, and the parsing of options \
- * created thereby
+/**
+ * \file 30-option-collection.cpp
+ * \author Adam Marshall (ih8celery)
+ * \brief test definition of option_t::collection
  */
 
 #include <tap++.h>
