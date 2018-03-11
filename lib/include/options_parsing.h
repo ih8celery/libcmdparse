@@ -1,3 +1,10 @@
+/**
+ * \file options_parsing.h
+ * 
+ * \author Adam Marshall (ih8celery)
+ *
+ * \brief interface to parse command line arguments/options
+ */
 #ifndef _MOD_CPP_OPTIONS_PARSING
 
 #define _MOD_CPP_OPTIONS_PARSING
@@ -76,8 +83,8 @@ namespace util {
 
       bool has(const std::string& name);
       size_t count(const std::string& name);
-      const std::string arg(const std::string& name, const std::string& d = "");
-      const std::pair<opt_data_t::const_iterator, opt_data_t::const_iterator>
+      std::string arg(const std::string& name, const std::string& d = "");
+      std::pair<opt_data_t::const_iterator, opt_data_t::const_iterator>
         list(const std::string& name);
 
       std::vector<std::string> rem;

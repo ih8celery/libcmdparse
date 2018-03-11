@@ -1,3 +1,10 @@
+/**
+ * \file options_parsing.cpp
+ *
+ * \author Adam Marshall (ih8celery)
+ *
+ * \brief parse command line arguments/options
+ */
 #include "options_parsing.h"
 #include <iostream>
 #include <sstream>
@@ -12,7 +19,7 @@ namespace util {
    * retrieve an option argument, returning d if the option
    * not found
    */
-  const std::string opt_info::arg(const std::string& name,
+  std::string opt_info::arg(const std::string& name,
                                   const std::string& d) {
 
     opt_data_t::const_iterator data = opt_data.find(name);
@@ -27,7 +34,7 @@ namespace util {
   /*
    * return a range of iterators denoting the values attached to an option 
    */
-  const std::pair<opt_data_t::const_iterator, opt_data_t::const_iterator>
+  std::pair<opt_data_t::const_iterator, opt_data_t::const_iterator>
   opt_info::list(const std::string& name) {
     
     const std::pair<opt_data_t::const_iterator,
