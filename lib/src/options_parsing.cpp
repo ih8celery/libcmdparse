@@ -737,11 +737,12 @@ namespace util {
           }
 
           bool parse_failed(false);
-          enum { START, PRE, DOT, POST } state = START;
+          enum class FLOAT_STATE { START, PRE, DOT, POST };
+          FLOAT_STATE state = FLOAT_STATE::START;
+
           if (opt.collection == Collect_Prop::SCALAR) {
               if (info.opt_data.find(opt.name) == info.opt_data.cend()) {
                 if (opt.data_type == Data_Prop::STRING); 
-
                 else if (opt.data_type == Data_Prop::INTEGER) {
                   for (const char& ch : args) {
                     if (!isdigit(ch)) {
@@ -756,16 +757,16 @@ namespace util {
                 }
                 else {
                   for (const char& ch : args) {
-                    if (isdigit(ch) && state == START) {
-                      state = PRE;
+                    if (isdigit(ch) && state == FLOAT_STATE::START) {
+                      state = FLOAT_STATE::PRE;
                     }
-                    else if (isdigit(ch) && state == DOT) {
-                      state = POST;
+                    else if (isdigit(ch) && state == FLOAT_STATE::DOT) {
+                      state = FLOAT_STATE::POST;
                     }
-                    else if (ch == '.' && state == PRE) {
-                      state = DOT;
+                    else if (ch == '.' && state == FLOAT_STATE::PRE) {
+                      state = FLOAT_STATE::DOT;
                     }
-                    else if (isdigit(ch) && state == POST) {
+                    else if (isdigit(ch) && state == FLOAT_STATE::POST) {
                       continue;
                     }
                     else {
@@ -773,7 +774,7 @@ namespace util {
                     }
                   }
 
-                  if (state != PRE && state != POST) {
+                  if (state != FLOAT_STATE::PRE && state != FLOAT_STATE::POST) {
                     throw parse_error(std::string("data '") + args + "' is not a float argument");
                   }
                 }
@@ -804,16 +805,16 @@ namespace util {
               }
               else {
                 for (const char& ch : data) {
-                  if (isdigit(ch) && state == START) {
-                    state = PRE;
+                  if (isdigit(ch) && state == FLOAT_STATE::START) {
+                    state = FLOAT_STATE::PRE;
                   }
-                  else if (isdigit(ch) && state == DOT) {
-                    state = POST;
+                  else if (isdigit(ch) && state == FLOAT_STATE::DOT) {
+                    state = FLOAT_STATE::POST;
                   }
-                  else if (ch == '.' && state == PRE) {
-                    state = DOT;
+                  else if (ch == '.' && state == FLOAT_STATE::PRE) {
+                    state = FLOAT_STATE::DOT;
                   }
-                  else if (isdigit(ch) && state == POST) {
+                  else if (isdigit(ch) && state == FLOAT_STATE::POST) {
                     continue;
                   }
                   else {
@@ -821,7 +822,7 @@ namespace util {
                   }
                 }
 
-                if (state != PRE && state != POST) {
+                if (state != FLOAT_STATE::PRE && state != FLOAT_STATE::POST) {
                   throw parse_error(std::string("data '") + data + "' is not a float argument");
                 }
               }
