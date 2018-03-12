@@ -388,7 +388,7 @@ namespace util {
        * \brief test whether option with handle has given name
        */
       bool handle_has_name(const std::string& handle, const std::string& name) const {
-        const std::map<std::string, option_t>::const_iterator
+        const std::unordered_map<std::string, option_t>::const_iterator
           iter = handle_map.find(handle);
 
         if (iter == handle_map.cend()) {
@@ -399,7 +399,7 @@ namespace util {
         }
       }
     private:
-      std::map<std::string, option_t> handle_map;
+      std::unordered_map<std::string, option_t> handle_map;
       std::set<option_t> name_set;
 
       bool is_case_sensitive;

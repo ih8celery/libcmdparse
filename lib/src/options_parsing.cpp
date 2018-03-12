@@ -685,7 +685,7 @@ namespace util {
     for (int i = 0; i < argc; ++i) {
       std::string handle = argv[i];
       eq_loc = handle.find_first_of('=');
-      std::map<std::string, option_t>::const_iterator iter;
+      std::unordered_map<std::string, option_t>::const_iterator iter;
 
       // get the handle
       if (eq_loc == std::string::npos) {
