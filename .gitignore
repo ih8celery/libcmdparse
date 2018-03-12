@@ -13,5 +13,4 @@ t/subcommand
 build/
 doc/man
 doc/latex
-doc/html
 tags
