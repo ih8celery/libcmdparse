@@ -28,7 +28,7 @@ int main() {
   args[1] = (char*)"--friends=james,mark,sylvester";
   auto info = parser.parse(args, ARGC);
 
-  is(info.count("age"), 1, "age may occur once and store one value");
+  ok(info.count("age") == 1, "age may occur at most once and store integer");
 
   is(info.count("friends"), 3, "friends may occur once, but processes arg into comma-separated list");
 
