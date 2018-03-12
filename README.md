@@ -1,4 +1,4 @@
-liboptparse version 0.3.0
+liboptparse version 0.3.0-1
 
 # What is liboptparse?
   liboptparse is a simple library for command line argument parsing.
