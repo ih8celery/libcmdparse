@@ -116,8 +116,6 @@ namespace util {
     FLOAT    /// argument must be /INTEGER/ or /INTEGER\.INTEGER/
   };
 
-
-
   /**
    * \struct option_t
    * \brief collects the properties and identity of an option
@@ -147,7 +145,7 @@ namespace util {
      * \brief tests whether options are similar enough to be used \
      *   interchangeably
      */
-    bool compatible(const option_t& opt) {
+    bool compatible(const option_t& opt) const {
       return (number == opt.number
               && assignment == opt.assignment
               && data_type == opt.data_type
@@ -183,25 +181,25 @@ namespace util {
        * \fn bool has(const string&)
        * \brief test whether a particular option was found in parsing
        */
-      bool has(const std::string&);
+      bool has(const std::string&) const;
       
       /**
        * \fn size_t count(const string&)
        * \brief count occurrences of option during parsing
        */
-      opt_data_t::size_type count(const std::string&);
+      opt_data_t::size_type count(const std::string&) const;
 
       /**
        * \fn string arg(const string&, const string = "")
        * \brief retrieve an option's argument, or default value if it had none
        */
-      std::string arg(const std::string&, const std::string& = "");
+      std::string arg(const std::string&, const std::string& = "") const;
       
       /**
        * \fn RangePair list(const string&)
        * \brief retrieve the range of iterators with parameter as key
        */
-      RangePair list(const std::string&);
+      RangePair list(const std::string&) const;
 
       /**
        * \var vector<string> rem

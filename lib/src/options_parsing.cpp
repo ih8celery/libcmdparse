@@ -31,7 +31,7 @@ namespace util {
                          collection(Collect_Prop::SCALAR),
                          data_type(Data_Prop::STRING) {}
 
-  std::string opt_info::arg(const std::string& name, const std::string& d) {
+  std::string opt_info::arg(const std::string& name, const std::string& d) const {
     opt_data_t::const_iterator data = opt_data.find(name);
 
     if (data == opt_data.cend()) {
@@ -41,18 +41,18 @@ namespace util {
     return data->second;
   }
 
-  RangePair opt_info::list(const std::string& name) {
+  RangePair opt_info::list(const std::string& name) const {
     const std::pair<opt_data_t::const_iterator, opt_data_t::const_iterator>
       rng = opt_data.equal_range(name);
 
     return rng;
   }
 
-  size_t opt_info::count(const std::string& name) {
+  size_t opt_info::count(const std::string& name) const {
     return opt_data.count(name);
   }
 
-  bool opt_info::has(const std::string& name) {
+  bool opt_info::has(const std::string& name) const {
     return (opt_data.find(name) != opt_data.cend());
   }
 
