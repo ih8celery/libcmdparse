@@ -39,17 +39,17 @@ namespace util {
    * \enum Mod_Prop
    * \brief defines the type of modifier of an option
    * 
-   * a specification of the Mod_Prop conforms to the following:
-   * <mod_prop>     := '['<modifier>']' | <nil>
-   * <modifier>     := <mod_function><mod_arg> | <mod_setting>
-   * <mod_function> := '<'   // Mod_Prop::BEFORE
-   *                 | '>'   // Mod_Prop::AFTER
-   *                 | '!'   // Mod_Prop::NOT_WITH
-   * <mod_arg>      := <option_name>
-   * <mod_setting>  := '&'   // Mod_Prop::SUB
+   * a specification of the Mod_Prop conforms to the following: <br>
+   * <mod_prop>     := '['<modifier>']' | <nil> <br>
+   * <modifier>     := <mod_function><mod_arg> | <mod_setting> <br>
+   * <mod_function> := '<'   // Mod_Prop::BEFORE <br>
+   *                 | '>'   // Mod_Prop::AFTER <br>
+   *                 | '!'   // Mod_Prop::NOT_WITH <br>
+   * <mod_arg>      := <option_name> <br>
+   * <mod_setting>  := '&'   // Mod_Prop::SUB <br>
    *
-   * in case a mod_function is used, the mod_arg need not name a
-   * valid option
+   * in case a mod_function is used, the mod_arg need not name a <br>
+   * valid option <br>
    */
   enum class Mod_Prop {
     NONE,    /// no modifier for option
@@ -63,9 +63,9 @@ namespace util {
    * \enum Num_Prop
    * \brief defines the number of times an option may appear
    *
-   * <num_prop> := <nil> // Num_Prop::ZERO_ONE
-   *             | '?'   // Num_Prop::ZERO_ONE
-   *             | '*'   // Num_Prop::ZERO_MANY
+   * <num_prop> := <nil> // Num_Prop::ZERO_ONE <br>
+   *             | '?'   // Num_Prop::ZERO_ONE <br>
+   *             | '*'   // Num_Prop::ZERO_MANY <br>
    */
   enum class Num_Prop {
     ZERO_ONE, /// option may appear zero times or one
@@ -76,11 +76,11 @@ namespace util {
    * \enum Assign_Prop
    * \brief defines the mode of assignment supported by option
    *
-   * <assign_prop> := <nil> // Assign_Prop::NONE
-   *                | '='   // Assign_Prop::EQ_REQUIRED
-   *                | '=?'  // Assign_Prop::EQ_MAYBE
-   *                | '=!'  // Assign_Prop::EQ_NEVER
-   *                | '=|'  // Assign_Prop::STUCK_ARG
+   * <assign_prop> := <nil> // Assign_Prop::NONE <br>
+   *                | '='   // Assign_Prop::EQ_REQUIRED <br>
+   *                | '=?'  // Assign_Prop::EQ_MAYBE <br>
+   *                | '=!'  // Assign_Prop::EQ_NEVER <br>
+   *                | '=|'  // Assign_Prop::STUCK_ARG <br>
    */
   enum class Assign_Prop {
     NO_ASSIGN,   /// option may not take argument
@@ -93,8 +93,8 @@ namespace util {
    * \enum Collect_Prop
    * \brief defines how arguments are interpreted
    *
-   * <collect_prop> := <nil>             // Collect_Prop::SCALAR
-   *                 | '['<data_prop>']' // Collect_Prop::LIST
+   * <collect_prop> := <nil>             // Collect_Prop::SCALAR <br>
+   *                 | '['<data_prop>']' // Collect_Prop::LIST <br>
    */
   enum class Collect_Prop {
     SCALAR, /// argument is stored as a single object
@@ -105,10 +105,10 @@ namespace util {
    * \enum Data_Prop
    * \brief defines the type of data of an option's argument
    *
-   * <data_prop> := <nil> // Data_Prop::STRING
-   *              | 's'   // Data_Prop::STRING
-   *              | 'i'   // Data_Prop::INTEGER
-   *              | 'f'   // Data_Prop::FLOAT
+   * <data_prop> := <nil> // Data_Prop::STRING <br>
+   *              | 's'   // Data_Prop::STRING <br>
+   *              | 'i'   // Data_Prop::INTEGER <br>
+   *              | 'f'   // Data_Prop::FLOAT <br>
    */
   enum class Data_Prop {
     STRING,  /// any printable character permitted
@@ -142,7 +142,7 @@ namespace util {
 
     /**
      * \fn bool compatible(const option_t&)
-     * \brief tests whether options are similar enough to be used \
+     * \brief tests whether options are similar enough to be used
      *   interchangeably
      */
     bool compatible(const option_t& opt) const {
@@ -241,10 +241,9 @@ namespace util {
        * \fn option_t option(const string&, const string& = "")
        * \brief declare an option to the parser
        *
-       * option name is the second argument to the function
-       * see doc/option/spec.md for full description of options
-       *
-       * throws an option_language_error if something goes wrong
+       * option name is the second argument to the function <br>
+       * see doc/option/spec.md for full description of options. <br>
+       * throws an option_language_error if something goes wrong <br>
        */
       option_t option(const std::string&, const std::string& = "");
 
@@ -252,10 +251,9 @@ namespace util {
        * \fn opt_info parse(char **&, int)
        * \brief extract options from argv into an opt_info object
        *
-       * any options or data belonging to options is removed from
-       * argv and replaced with nullptr
-       *
-       * throws a parse_error if something goes wrong
+       * any options or data belonging to options is removed from <br>
+       * argv and replaced with nullptr. <br>
+       * throws a parse_error if something goes wrong <br>
        */
       opt_info parse(char ** &argv, int argc);
 
@@ -263,9 +261,8 @@ namespace util {
        * \fn void set(const config_constants::case_sensitive_t&, bool = true)
        * \brief configure opt_parser's case sensitivity when parsing
        * 
-       * case sensitivity of option names and stored handles is NOT affected
-       *
-       * default: true
+       * case sensitivity of option names and stored handles is NOT affected <br>
+       * default: true <br>
        */
       void set(const config_constants::case_sensitive_t& c, bool val = true) {
         if (this->empty()) {
@@ -277,17 +274,16 @@ namespace util {
        * \fn void set(const config_constants::bsd_opt_t&, bool = true)
        * \brief configure opt_parser's ability to detect bsd-style options
        * 
-       * zero or more bsd-style options may then appear at the beginning of argv,
-       * under the following conditions:
-       *   1. option prefixes (-, --, +, etc) are not allowed in these options
-       *   2. option handles must be exactly one letter long without a prefix
-       *   3. options must be concatenated into one string, stored in argv[0]
-       *   4. the first invalid or incomplete option causes parsing to fail
+       * zero or more bsd-style options may then appear at the beginning of argv, <br>
+       * under the following conditions: <br>
+       *   1. option prefixes (-, --, +, etc) are not allowed in these options <br>
+       *   2. option handles must be exactly one letter long without a prefix <br>
+       *   3. options must be concatenated into one string, stored in argv[0] <br>
+       *   4. the first invalid or incomplete option causes parsing to fail <br>
+       * default: false <br>
        *
-       * default: false
-       *
-       * NOTE: "BSD-style" options conflict with subcommands, so enabling
-       *   this setting implicitly disables subcommands
+       * NOTE: "BSD-style" options conflict with subcommands, so enabling <br>
+       *   this setting implicitly disables subcommands <br>
        */
       void set(const config_constants::bsd_opt_t& c, bool val = true) {
         if (this->empty()) {
@@ -303,14 +299,13 @@ namespace util {
        * \fn void set(const config_constants::merged_opt_t&, bool = true)
        * \brief configure opt_parser's ability to detect merged options
        *
-       * merged options are identical to bsd-style options except in one
-       * respect: the first option detected in argv[0] must include its
-       * prefix
+       * merged options are identical to bsd-style options except in one <br>
+       * respect: the first option detected in argv[0] must include its <br>
+       * prefix <br>
+       * default: false <br>
        *
-       * default: false
-       *
-       * NOTE: "merged" options conflict with subcommands, so enabling
-       *   this setting implicitly disables subcommands
+       * NOTE: "merged" options conflict with subcommands, so enabling <br>
+       *   this setting implicitly disables subcommands <br>
        */
       void set(const config_constants::merged_opt_t& c, bool val = true) {
         if (this->empty()) {
@@ -324,12 +319,11 @@ namespace util {
 
       /**
        * \fn void set(const config_constants::error_if_unknown_t&, bool = true)
-       * \brief configure opt_parser's response to a char* in argv that resembles \
+       * \brief configure opt_parser's response to a char* in argv that resembles
        *   a valid option but is not known to the parser
        * 
-       * true causes error to be thrown when such an invalid option found
-       *
-       * default: true
+       * true causes error to be thrown when such an invalid option found. <br>
+       * default: true <br>
        */
       void set(const config_constants::error_if_unknown_t& c, bool val = true) {
         if (this->empty()) {
@@ -339,17 +333,17 @@ namespace util {
 
       /**
        * \fn void set(const config_constants::subcommand_t&, bool = true)
-       * \brief configure opt_parser's ability to detect subcommands. opt_parser
-       * may not support subcommands and merged options or bsd options
-       * simultaneously. a subcommand may be any valid handle, but it must
-       * appear in argv[0]. if subcommands are enabled, it is an error
-       * NOT to provide one. subcommands may still be declared in the
-       * option spec, but will be ignored if this setting is false.
+       * \brief configure opt_parser's ability to detect subcommands
        *
-       * default: false
+       * opt_parser may not support subcommands and merged options or bsd options <br>
+       * simultaneously. a subcommand may be any valid handle, but it must <br>
+       * appear in argv[0]. if subcommands are enabled, it is an error <br>
+       * NOT to provide one. subcommands may still be declared in the <br>
+       * option spec, but will be ignored if this setting is false. <br>
+       * default: false <br>
        *
-       * NOTE: subcommands conflict with "BSD-style" and "merged" options,
-       *   so enabling this setting implicitly disables those settings
+       * NOTE: subcommands conflict with "BSD-style" and "merged" options, <br>
+       *   so enabling this setting implicitly disables those settings <br>
        */
       void set(const config_constants::subcommand_t& c, bool val = true) {
         if (this->empty()) {
@@ -427,7 +421,7 @@ namespace util {
 
   /**
    * \class option_language_error
-   * \brief thrown when options declared or, in one case, at the \
+   * \brief thrown when options declared or, in one case, at the
    *   start of parsing
    */
   class option_language_error : std::exception {
