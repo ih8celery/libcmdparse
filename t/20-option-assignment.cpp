@@ -1,15 +1,13 @@
-/*
- * option-assignment.cpp
- *
- * test the definition of the option_t::assignment property by
- * option declarations, and the parsing of options where that
- * property is of interest
+/**
+ * \file 20-option-assignment.cpp
+ * \author Adam Marshall (ih8celery)
+ * \brief test the definition of the option_t::assignment property
  */
 
 #include "options_parsing.h"
 #include <tap++.h>
 
-#define ARGC 7
+constexpr int ARGC = 7;
 
 using namespace TAP;
 

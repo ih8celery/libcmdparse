@@ -1,15 +1,13 @@
-/*
- * option-collection.cpp
- *
- * test definition of option_t::collection by calls to
- * option_parser::option, and the parsing of options
- * created thereby
+/**
+ * \file 30-option-collection.cpp
+ * \author Adam Marshall (ih8celery)
+ * \brief test definition of option_t::collection
  */
 
 #include <tap++.h>
 #include "options_parsing.h"
 
-#define ARGC 2
+constexpr int ARGC = 2;
 
 using namespace TAP;
 
@@ -30,7 +28,7 @@ int main() {
   args[1] = (char*)"--friends=james,mark,sylvester";
   auto info = parser.parse(args, ARGC);
 
-  is(info.count("age"), 1, "age may occur once and store one value");
+  ok(info.count("age") == 1, "age may occur at most once and store integer");
 
   is(info.count("friends"), 3, "friends may occur once, but processes arg into comma-separated list");
 

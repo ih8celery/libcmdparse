@@ -1,9 +1,9 @@
-liboptparse version 0.2.0
+liboptparse version 0.3.0-1
 
 # What is liboptparse?
   liboptparse is a simple library for command line argument parsing.
 options may be declared in a domain specific language resembling
-regular expressions. the parsing target will be passed manually
+regular expressions.
 
 # Why does liboptparse exist?
   this project may seem to imitate existing tools. that
@@ -120,12 +120,6 @@ this scenario.
 that supports C++11.
 
   all tests depend on libtap++.
-
-  if you want to run a more extensive test suite, debug tests are provided
-and run with `make debug`. currently *debug* testing on your machine uses
-a shell script included in the lib/ directory of the project. this script
-is a workaround to using CTest. you can avoid using this script and
-run ctest instead. instructions are given in the installation section
 
 # Installation
 
