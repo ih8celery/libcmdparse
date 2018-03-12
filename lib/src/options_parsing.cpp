@@ -56,6 +56,126 @@ namespace util {
     return (opt_data.find(name) != opt_data.cend());
   }
 
+  /*
+   * definitions of opt_parser's helpers
+   */
+  namespace {
+    enum class DT_STATE {
+      START,
+      LDIGIT,
+      RDIGIT,
+      DOT,
+      END
+    };
+
+    bool verify_arg_type(const std::string& arg, Data_Prop prop) {
+      DT_STATE state = DT_STATE::START;
+      
+      const std::string::size_type size = arg.size();
+
+      switch (prop) {
+      case Data_Prop::STRING:
+        break;
+      case Data_Prop::INTEGER:
+        for (int i = 0; i < size; ++i) {
+          char ch = arg[i];
+
+          switch (state) {
+            case DT_STATE::START:
+              if (i == size - 1 && !isdigit(ch)) {
+                return false;
+              }
+              else if (isdigit(ch)) {
+                state = DT_STATE::LDIGIT;
+              }
+              else if (!isspace(ch)) {
+                return false;
+              }
+
+              break;
+            case DT_STATE::LDIGIT:
+              if (isspace(ch)) {
+                state = DT_STATE::END;
+              }
+              else if (!isdigit(ch)) {
+                return false;
+              }
+
+              break;
+            case DT_STATE::DOT:
+            case DT_STATE::RDIGIT:
+            case DT_STATE::END:
+              if (!isspace(ch)) {
+                return false;
+              }
+
+              break;
+          }
+        }
+      case Data_Prop::FLOAT:
+        for (int i = 0; i < size; ++i) {
+          char ch = arg[i];
+
+          switch (state) {
+            case DT_STATE::START:
+              if (i == size - 1 && !isdigit(ch)) {
+                return false;
+              }
+              else if (isdigit(ch)) {
+                state = DT_STATE::LDIGIT;
+              }
+              else if (!isspace(ch)) {
+                return false;
+              }
+
+              break;
+            case DT_STATE::LDIGIT:
+              if (isspace(ch)) {
+                state = DT_STATE::END;
+              }
+              else if (ch == '.') {
+                state = DT_STATE::DOT;
+              }
+              else if (!isdigit(ch)) {
+                return false;
+              }
+
+              break;
+            case DT_STATE::DOT:
+              if (i == size - 1 && !isdigit(ch)) {
+                return false;
+              }
+              else if (isdigit(ch)) {
+                state = DT_STATE::RDIGIT;
+              }
+              else {
+                return false;
+              }
+
+              break;
+            case DT_STATE::RDIGIT:
+              if (isspace(ch)) {
+                state = DT_STATE::END;
+              }
+              else if (!isdigit(ch)) {
+                return false;
+              }
+
+              break;
+            case DT_STATE::END:
+              if (!isspace(ch)) {
+                return false;
+              }
+
+              break;
+          }
+        }
+      }
+
+      return true;
+    }
+  }
+
   opt_parser::opt_parser() : is_case_sensitive(true),
                              is_bsd_opt_enabled(false),
                              is_merged_opt_enabled(false),
@@ -63,9 +183,7 @@ namespace util {
                              is_error_unknown_enabled(true),
                              is_mod_found(false) {}
 
-  option_t opt_parser::option(const std::string& spec,
-                              const std::string& name) {
-
+  option_t opt_parser::option(const std::string& spec, const std::string& name) {
     enum Option_State { MOD, MOD_FN, MOD_ARG, MOD_END, NONE, PREFIX_END,
                         PLUS_PREFIX, MINUS_PREFIX, NAME, NUMBER, EQ,
                         ARG, ARGLIST, ARGLIST_END, DONE } state = MOD;
@@ -736,121 +854,15 @@ namespace util {
             }
           }
 
-          enum class DT_STATE { START, LDIGIT, RDIGIT, DOT, END };
-          DT_STATE state = DT_STATE::START;
-
           if (opt.collection == Collect_Prop::SCALAR) {
               if (info.opt_data.find(opt.name) == info.opt_data.cend()) {
-                if (opt.data_type == Data_Prop::STRING); 
-                else if (opt.data_type == Data_Prop::INTEGER) {
-                  for (int i = 0; i < args.size(); ++i) {
-                    char ch = args[i];
-
-                    switch (state) {
-                      case DT_STATE::START:
-                        if (i == args.size() - 1 && !isdigit(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not an integer");
-                        }
-                        else if (isdigit(ch)) {
-                          state = DT_STATE::LDIGIT;
-                        }
-                        else if (!isspace(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not an integer");
-                        }
-
-                        break;
-                      case DT_STATE::LDIGIT:
-                        if (isspace(ch)) {
-                          state = DT_STATE::END;
-                        }
-                        else if (!isdigit(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not an integer");
-                        }
-
-                        break;
-                      case DT_STATE::DOT:
-                      case DT_STATE::RDIGIT:
-                      case DT_STATE::END:
-                        if (!isspace(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not an integer");
-                        }
-
-                        break;
-                    }
-                  }
+                if (verify_arg_type(args, opt.data_type)) {
+                  info.opt_data.insert(std::make_pair(opt.name, args));
                 }
                 else {
-                  for (int i = 0; i < args.size(); ++i) {
-                    char ch = args[i];
-
-                    switch (state) {
-                      case DT_STATE::START:
-                        if (i == args.size() - 1 && !isdigit(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not a float");
-                        }
-                        else if (isdigit(ch)) {
-                          state = DT_STATE::LDIGIT;
-                        }
-                        else if (!isspace(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not a float");
-                        }
-
-                        break;
-                      case DT_STATE::LDIGIT:
-                        if (isspace(ch)) {
-                          state = DT_STATE::END;
-                        }
-                        else if (ch == '.') {
-                          state = DT_STATE::DOT;
-                        }
-                        else if (!isdigit(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not a float");
-                        }
-
-                        break;
-                      case DT_STATE::DOT:
-                        if (i == args.size() - 1 && !isdigit(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not a float");
-                        }
-                        else if (isdigit(ch)) {
-                          state = DT_STATE::RDIGIT;
-                        }
-                        else {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not a float");
-                        }
-
-                        break;
-                      case DT_STATE::RDIGIT:
-                        if (isspace(ch)) {
-                          state = DT_STATE::END;
-                        }
-                        else if (!isdigit(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not a float");
-                        }
-
-                        break;
-                      case DT_STATE::END:
-                        if (!isspace(ch)) {
-                          throw parse_error(std::string("data '")
-                              + args + "' is not a float");
-                        }
-
-                        break;
-                    }
-                  }
+                  throw parse_error(std::string("data '")
+                      + args + "' does not match its declared type");
                 }
-
-                info.opt_data.insert(std::make_pair(opt.name, args));
               }
               else {
                 throw parse_error(std::string("handle repeated: ") + handle);
@@ -861,116 +873,13 @@ namespace util {
             std::string data;
 
             while (std::getline(src, data, ',')) {
-              if (opt.data_type == Data_Prop::STRING);
-              else if (opt.data_type == Data_Prop::INTEGER) {
-                for (int i = 0; i < data.size(); ++i) {
-                  char ch = data[i];
-
-                  switch (state) {
-                    case DT_STATE::START:
-                      if (i == data.size() - 1 && !isdigit(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not an integer");
-                      }
-                      else if (isdigit(ch)) {
-                        state = DT_STATE::LDIGIT;
-                      }
-                      else if (!isspace(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not an integer");
-                      }
-
-                      break;
-                    case DT_STATE::LDIGIT:
-                      if (isspace(ch)) {
-                        state = DT_STATE::END;
-                      }
-                      else if (!isdigit(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not an integer");
-                      }
-
-                      break;
-                    case DT_STATE::DOT:
-                    case DT_STATE::RDIGIT:
-                    case DT_STATE::END:
-                      if (!isspace(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not an integer");
-                      }
-
-                      break;
-                  }
-                }
+              if (verify_arg_type(data, opt.data_type)) {
+                info.opt_data.insert(std::make_pair(opt.name, data));
               }
               else {
-                for (int i = 0; i < data.size(); ++i) {
-                  char ch = data[i];
-
-                  switch (state) {
-                    case DT_STATE::START:
-                      if (i == data.size() - 1 && !isdigit(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not a float");
-                      }
-                      else if (isdigit(ch)) {
-                        state = DT_STATE::LDIGIT;
-                      }
-                      else if (!isspace(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not a float");
-                      }
-
-                      break;
-                    case DT_STATE::LDIGIT:
-                      if (isspace(ch)) {
-                        state = DT_STATE::END;
-                      }
-                      else if (ch == '.') {
-                        state = DT_STATE::DOT;
-                      }
-                      else if (!isdigit(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not a float");
-                      }
-
-                      break;
-                    case DT_STATE::DOT:
-                      if (i == data.size() - 1 && !isdigit(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not a float");
-                      }
-                      else if (isdigit(ch)) {
-                        state = DT_STATE::RDIGIT;
-                      }
-                      else {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not a float");
-                      }
-
-                      break;
-                    case DT_STATE::RDIGIT:
-                      if (isspace(ch)) {
-                        state = DT_STATE::END;
-                      }
-                      else if (!isdigit(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not a float");
-                      }
-
-                      break;
-                    case DT_STATE::END:
-                      if (!isspace(ch)) {
-                        throw parse_error(std::string("data '")
-                            + data + "' is not a float");
-                      }
-
-                      break;
-                  }
-                }
+                throw parse_error(std::string("data '")
+                    + data + "' does not match declared type");
               }
-
-              info.opt_data.insert(std::make_pair(opt.name, data));
             }
           }
         }

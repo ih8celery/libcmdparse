@@ -116,6 +116,8 @@ namespace util {
     FLOAT    /// argument must be /INTEGER/ or /INTEGER\.INTEGER/
   };
 
+
+
   /**
    * \struct option_t
    * \brief collects the properties and identity of an option
@@ -213,6 +215,17 @@ namespace util {
        */
       opt_data_t opt_data;
   };
+
+  /*
+   * declarations of opt_parser's helpers
+   */
+  namespace {
+    /*
+     * called by parse() to check that the argument(s) to an option
+     * conform to their declared Data_Prop
+     */
+    bool verify_arg_type(const std::string&, Data_Prop);
+  }
 
   /**
    * \class opt_parser
