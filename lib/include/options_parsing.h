@@ -9,7 +9,6 @@
 
 #define _MOD_CPP_OPTIONS_PARSING
 
-#include <map>
 #include <unordered_map>
 #include <set>
 #include <string>
@@ -17,7 +16,7 @@
 #include <exception>
 
 namespace util {
-  using opt_data_t = std::multimap<std::string, std::string>;
+  using opt_data_t = std::unordered_multimap<std::string, std::string>;
 
   using RangePair = std::pair<opt_data_t::const_iterator, opt_data_t::const_iterator>;
 
@@ -218,6 +217,8 @@ namespace util {
    * declarations of opt_parser's helpers
    */
   namespace {
+    enum class Option_State;
+
     /*
      * called by parse() to check that the argument(s) to an option
      * conform to their declared Data_Prop
@@ -393,6 +394,9 @@ namespace util {
         }
       }
     private:
+      Option_State process_MOD(const char *, int&, option_t&);
+      Option_State process_HANDLES(const char *, int&, option_t&, std::vector<std::string>&);
+
       std::unordered_map<std::string, option_t> handle_map;
       std::set<option_t> name_set;
 
