@@ -40,7 +40,7 @@ int main () {
 
   auto info = parser.parse(args, ARGC);
   
-  ok(info.rem.size() == 2, "two non-options found");
+  ok(info.rest.size() == 2, "two non-options found");
 
   ok(info.count("verbose") == 3, "found three verbose options");
 

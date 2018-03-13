@@ -785,7 +785,7 @@ namespace util {
           throw parse_error(std::string("unknown option with handle: ") + handle); 
         }
         else {
-          info.rem.push_back(handle);
+          info.rest.push_back(handle);
           continue;
         }
       }

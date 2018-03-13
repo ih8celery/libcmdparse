@@ -202,10 +202,10 @@ namespace util {
       RangePair list(const std::string&) const;
 
       /**
-       * \var vector<string> rem
+       * \var vector<string> rest
        * \brief contains non-options found during parsing
        */
-      std::vector<std::string> rem;
+      std::vector<std::string> rest;
     private:
       /**
        * \var opt_data
