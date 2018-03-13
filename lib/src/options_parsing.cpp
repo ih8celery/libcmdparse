@@ -70,34 +70,30 @@ namespace util {
 
     bool verify_arg_type(const std::string& arg, Data_Prop prop) {
       DT_STATE state = DT_STATE::START;
-      
-      const std::string::size_type size = arg.size();
 
       switch (prop) {
       case Data_Prop::STRING:
         break;
       case Data_Prop::INTEGER:
-        for (int i = 0; i < size; ++i) {
-          char ch = arg[i];
-
+        for (auto i = std::begin(arg); i != std::end(arg); ++i) {
           switch (state) {
             case DT_STATE::START:
-              if (i == size - 1 && !isdigit(ch)) {
+              if (i + 1 == std::end(arg) && !isdigit(*i)) {
                 return false;
               }
-              else if (isdigit(ch)) {
+              else if (isdigit(*i)) {
                 state = DT_STATE::LDIGIT;
               }
-              else if (!isspace(ch)) {
+              else if (!isspace(*i)) {
                 return false;
               }
 
               break;
             case DT_STATE::LDIGIT:
-              if (isspace(ch)) {
+              if (isspace(*i)) {
                 state = DT_STATE::END;
               }
-              else if (!isdigit(ch)) {
+              else if (!isdigit(*i)) {
                 return false;
               }
 
@@ -105,7 +101,7 @@ namespace util {
             case DT_STATE::DOT:
             case DT_STATE::RDIGIT:
             case DT_STATE::END:
-              if (!isspace(ch)) {
+              if (!isspace(*i)) {
                 return false;
               }
 
@@ -113,39 +109,37 @@ namespace util {
           }
         }
       case Data_Prop::FLOAT:
-        for (int i = 0; i < size; ++i) {
-          char ch = arg[i];
-
+        for (auto i = std::begin(arg); i != std::end(arg); ++i) {
           switch (state) {
             case DT_STATE::START:
-              if (i == size - 1 && !isdigit(ch)) {
+              if (i + 1 == std::end(arg) && !isdigit(*i)) {
                 return false;
               }
-              else if (isdigit(ch)) {
+              else if (isdigit(*i)) {
                 state = DT_STATE::LDIGIT;
               }
-              else if (!isspace(ch)) {
+              else if (!isspace(*i)) {
                 return false;
               }
 
               break;
             case DT_STATE::LDIGIT:
-              if (isspace(ch)) {
+              if (isspace(*i)) {
                 state = DT_STATE::END;
               }
-              else if (ch == '.') {
+              else if (*i == '.') {
                 state = DT_STATE::DOT;
               }
-              else if (!isdigit(ch)) {
+              else if (!isdigit(*i)) {
                 return false;
               }
 
               break;
             case DT_STATE::DOT:
-              if (i == size - 1 && !isdigit(ch)) {
+              if (i + 1 == std::end(arg) && !isdigit(*i)) {
                 return false;
               }
-              else if (isdigit(ch)) {
+              else if (isdigit(*i)) {
                 state = DT_STATE::RDIGIT;
               }
               else {
@@ -154,16 +148,16 @@ namespace util {
 
               break;
             case DT_STATE::RDIGIT:
-              if (isspace(ch)) {
+              if (isspace(*i)) {
                 state = DT_STATE::END;
               }
-              else if (!isdigit(ch)) {
+              else if (!isdigit(*i)) {
                 return false;
               }
 
               break;
             case DT_STATE::END:
-              if (!isspace(ch)) {
+              if (!isspace(*i)) {
                 return false;
               }
 
