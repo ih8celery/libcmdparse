@@ -39,7 +39,7 @@ int main() {
   args[6] = (char *)"finally";
 
   util::opt_info info = parser.parse(args, ARGC); 
-  ok(info.rem.size() == 3, "found three non-options");
+  ok(info.rest.size() == 3, "found three non-options");
 
   is(info.arg("wife"), "ellen", "wife's name is ellen");
 

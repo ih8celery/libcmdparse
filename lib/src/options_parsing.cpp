@@ -70,34 +70,30 @@ namespace util {
 
     bool verify_arg_type(const std::string& arg, Data_Prop prop) {
       DT_STATE state = DT_STATE::START;
-      
-      const std::string::size_type size = arg.size();
 
       switch (prop) {
       case Data_Prop::STRING:
         break;
       case Data_Prop::INTEGER:
-        for (int i = 0; i < size; ++i) {
-          char ch = arg[i];
-
+        for (auto i = std::begin(arg); i != std::end(arg); ++i) {
           switch (state) {
             case DT_STATE::START:
-              if (i == size - 1 && !isdigit(ch)) {
+              if (i + 1 == std::end(arg) && !isdigit(*i)) {
                 return false;
               }
-              else if (isdigit(ch)) {
+              else if (isdigit(*i)) {
                 state = DT_STATE::LDIGIT;
               }
-              else if (!isspace(ch)) {
+              else if (!isspace(*i)) {
                 return false;
               }
 
               break;
             case DT_STATE::LDIGIT:
-              if (isspace(ch)) {
+              if (isspace(*i)) {
                 state = DT_STATE::END;
               }
-              else if (!isdigit(ch)) {
+              else if (!isdigit(*i)) {
                 return false;
               }
 
@@ -105,7 +101,7 @@ namespace util {
             case DT_STATE::DOT:
             case DT_STATE::RDIGIT:
             case DT_STATE::END:
-              if (!isspace(ch)) {
+              if (!isspace(*i)) {
                 return false;
               }
 
@@ -113,39 +109,37 @@ namespace util {
           }
         }
       case Data_Prop::FLOAT:
-        for (int i = 0; i < size; ++i) {
-          char ch = arg[i];
-
+        for (auto i = std::begin(arg); i != std::end(arg); ++i) {
           switch (state) {
             case DT_STATE::START:
-              if (i == size - 1 && !isdigit(ch)) {
+              if (i + 1 == std::end(arg) && !isdigit(*i)) {
                 return false;
               }
-              else if (isdigit(ch)) {
+              else if (isdigit(*i)) {
                 state = DT_STATE::LDIGIT;
               }
-              else if (!isspace(ch)) {
+              else if (!isspace(*i)) {
                 return false;
               }
 
               break;
             case DT_STATE::LDIGIT:
-              if (isspace(ch)) {
+              if (isspace(*i)) {
                 state = DT_STATE::END;
               }
-              else if (ch == '.') {
+              else if (*i == '.') {
                 state = DT_STATE::DOT;
               }
-              else if (!isdigit(ch)) {
+              else if (!isdigit(*i)) {
                 return false;
               }
 
               break;
             case DT_STATE::DOT:
-              if (i == size - 1 && !isdigit(ch)) {
+              if (i + 1 == std::end(arg) && !isdigit(*i)) {
                 return false;
               }
-              else if (isdigit(ch)) {
+              else if (isdigit(*i)) {
                 state = DT_STATE::RDIGIT;
               }
               else {
@@ -154,16 +148,16 @@ namespace util {
 
               break;
             case DT_STATE::RDIGIT:
-              if (isspace(ch)) {
+              if (isspace(*i)) {
                 state = DT_STATE::END;
               }
-              else if (!isdigit(ch)) {
+              else if (!isdigit(*i)) {
                 return false;
               }
 
               break;
             case DT_STATE::END:
-              if (!isspace(ch)) {
+              if (!isspace(*i)) {
                 return false;
               }
 
@@ -183,7 +177,7 @@ namespace util {
                              is_error_unknown_enabled(true),
                              is_mod_found(false) {}
 
-  option_t opt_parser::option(const std::string& spec, const std::string& name) {
+  option_t opt_parser::option(const char * spec, const std::string& name) {
     enum Option_State { MOD, MOD_FN, MOD_ARG, MOD_END, NONE, PREFIX_END,
                         PLUS_PREFIX, MINUS_PREFIX, NAME, NUMBER, EQ,
                         ARG, ARGLIST, ARGLIST_END, DONE } state = MOD;
@@ -191,57 +185,38 @@ namespace util {
     option_t opt;
     std::vector<std::string> handles;
     std::ostringstream buf;
-    bool has_input = true;
-    bool forward_char = false;
-    std::string::size_type index = 0; // current spec index
-    char ch;                          // current spec character
+    int spec_offset = 0;
 
     /* 
      * this loop processes the spec and name into an option_t object,
      * which is returned at the end of the switch case/DONE
      */
     while (true) {
-      // process next character {
-      if (forward_char) {
-        forward_char = false;
-      }
-      else {
-        if (index >= spec.size()) {
-          has_input = false;
-        }
-        else {
-          ch = spec[index];
-        }
-
-        index++;
-      }
-      // }
-
       /* execute code on the state of the option parser */
       switch(state) {
       case MOD:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
           state = DONE;
 
           break;
         }
 
-        if (ch == '[') {
+        if (spec[spec_offset] == '[') {
           state = MOD_FN;
         }
         else {
-          forward_char = true;
+          spec_offset--;
 
           state = NONE;
         }
 
         break;
       case MOD_FN:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
           throw option_language_error(std::string("input ended before parsing finished"));
         }
 
-        switch (ch) {
+        switch (spec[spec_offset]) {
           case '&':
             /* 
              * declaring an option as subcommand has no effect if setting not enabled
@@ -274,11 +249,11 @@ namespace util {
         break;
       case MOD_ARG:
       case MOD_END:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
           throw option_language_error(std::string("input ended before parsing finished"));
         }
 
-        if (ch == ']') {
+        if (spec[spec_offset] == ']') {
           state = NONE;
         }
         else {
@@ -287,13 +262,13 @@ namespace util {
 
         break;
       case NONE:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
           state = DONE;
 
           break;
         }
 
-        switch (ch) {
+        switch (spec[spec_offset]) {
           case '/':
           case '.':
           case ':':
@@ -309,7 +284,7 @@ namespace util {
 
             break;
           default:
-            if (is_name_start_char(ch)) {
+            if (is_name_start_char(spec[spec_offset])) {
               state = NAME;
             }
             else {
@@ -319,36 +294,36 @@ namespace util {
             break;
         }
 
-        buf << ch;
+        buf << (spec[spec_offset]);
 
         break;
       case MINUS_PREFIX:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
         throw option_language_error(std::string("input ended before handle complete"));
         }
 
-        if (ch == '-') {
+        if (spec[spec_offset] == '-') {
           state = PREFIX_END;
         }
-        else if (is_name_start_char(ch)) {
+        else if (is_name_start_char(spec[spec_offset])) {
           state = NAME;
         }
         else {
         throw option_language_error(std::string("input ended before handle complete"));
         }
 
-        buf << ch;
+        buf << (spec[spec_offset]);
 
         break;
       case PLUS_PREFIX:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
         throw option_language_error(std::string("input ended before handle complete"));
         }
 
-        if (ch == '+') {
+        if (spec[spec_offset] == '+') {
           state = PREFIX_END;
         }
-        else if (is_name_start_char(ch)) {
+        else if (is_name_start_char(spec[spec_offset])) {
           state = NAME;
         }
         else {
@@ -357,23 +332,23 @@ namespace util {
 
         break;
       case PREFIX_END:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
         throw option_language_error(std::string("input ended before hande complete"));
         }
 
-        if (is_name_start_char(ch)) {
-          buf << ch;
+        if (is_name_start_char(spec[spec_offset])) {
+          buf << (spec[spec_offset]);
 
           state = NAME;
         }
         else {
-        throw option_language_error(std::to_string(ch)
+        throw option_language_error(std::to_string(spec[spec_offset])
             + std::string(" invalid character for handle name: can only take word characters and '-'"));
         }
 
         break;
       case NAME:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
           if (!buf.str().empty()) {
             handles.push_back(buf.str());
             buf.str("");
@@ -384,7 +359,7 @@ namespace util {
           break;
         }
 
-        switch (ch) {
+        switch (spec[spec_offset]) {
         case '|':
           handles.push_back(buf.str());
           buf.str("");
@@ -417,8 +392,8 @@ namespace util {
         opt.number = Num_Prop::ZERO_MANY;
         break;
         default:
-          if (is_name_rest_char(ch)) {
-            buf << ch;
+          if (is_name_rest_char(spec[spec_offset])) {
+            buf << (spec[spec_offset]);
           }
           else {
           throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
@@ -428,7 +403,7 @@ namespace util {
 
         break;
       case NUMBER:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
           state = DONE;
 
           break;
@@ -437,13 +412,13 @@ namespace util {
         handles.push_back(buf.str());
         buf.str("");
 
-        if (ch == '=') {
+        if (spec[spec_offset] == '=') {
           state = EQ;
 
           opt.assignment = Assign_Prop::EQ_REQUIRED;
           opt.collection = Collect_Prop::SCALAR;
         }
-        else if (ch == '[') {
+        else if (spec[spec_offset] == '[') {
           state = ARGLIST;
 
           opt.assignment = Assign_Prop::NO_ASSIGN;
@@ -455,13 +430,13 @@ namespace util {
 
         break;
       case EQ:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
           state = DONE;
 
           break;
         }
 
-        switch (ch) {
+        switch (spec[spec_offset]) {
           case '?':
             opt.assignment = Assign_Prop::EQ_MAYBE;
             state = ARG;
@@ -501,14 +476,14 @@ namespace util {
 
         break;
       case ARG:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
           opt.data_type = Data_Prop::STRING;
           state = DONE;
 
           break;
         }
 
-        switch (ch) {
+        switch (spec[spec_offset]) {
           case '[':
             state = ARGLIST;
             opt.collection = Collect_Prop::LIST;
@@ -537,12 +512,12 @@ namespace util {
 
         break;
       case ARGLIST:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
         throw option_language_error(std::string(
                       "input ended in arg list"));
         }
 
-        switch (ch) {
+        switch (spec[spec_offset]) {
           case 's':
             opt.data_type = Data_Prop::STRING;
             state = ARGLIST_END;
@@ -571,12 +546,12 @@ namespace util {
 
         break;
       case ARGLIST_END:
-        if (!has_input) {
+        if (spec[spec_offset] == '\0') {
         throw option_language_error(std::string(
                       "input ended before arg list finished"));
         }
 
-        if (ch == ']') {
+        if (spec[spec_offset] == ']') {
           state = DONE;
         }
         else {
@@ -586,7 +561,7 @@ namespace util {
 
         break;
       case DONE:
-        if (has_input) {
+        if (spec[spec_offset] != '\0') {
           throw option_language_error(std::string("input found after option spec parsed"));
         }
         else {
@@ -659,6 +634,13 @@ namespace util {
         }
 
         return opt;
+      }
+
+      if (spec_offset < 0) {
+        spec_offset = 0;
+      }
+      else if (spec[spec_offset] != '\0'){
+        spec_offset++;
       }
     }
   }
@@ -785,7 +767,7 @@ namespace util {
           throw parse_error(std::string("unknown option with handle: ") + handle); 
         }
         else {
-          info.rem.push_back(handle);
+          info.rest.push_back(handle);
           continue;
         }
       }

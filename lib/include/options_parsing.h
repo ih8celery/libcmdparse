@@ -202,10 +202,10 @@ namespace util {
       RangePair list(const std::string&) const;
 
       /**
-       * \var vector<string> rem
+       * \var vector<string> rest
        * \brief contains non-options found during parsing
        */
-      std::vector<std::string> rem;
+      std::vector<std::string> rest;
     private:
       /**
        * \var opt_data
@@ -238,14 +238,14 @@ namespace util {
       opt_parser();
 
       /**
-       * \fn option_t option(const string&, const string& = "")
+       * \fn option_t option(const char *, const string& = "")
        * \brief declare an option to the parser
        *
        * option name is the second argument to the function <br>
        * see doc/option/spec.md for full description of options. <br>
        * throws an option_language_error if something goes wrong <br>
        */
-      option_t option(const std::string&, const std::string& = "");
+      option_t option(const char *, const std::string& = "");
 
       /**
        * \fn opt_info parse(char **&, int)
