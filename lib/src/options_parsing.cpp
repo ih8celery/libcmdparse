@@ -8,6 +8,7 @@
 #include "options_parsing.h"
 #include <sstream>
 #include <cctype>
+//#include <iostream>
 
 namespace {
   inline bool is_prefix_char(char ch) {
@@ -68,9 +69,8 @@ namespace util {
       END
     };
 
-    enum class Option_State { MOD, NONE, PREFIX_END,
-                              PLUS_PREFIX, MINUS_PREFIX, NAME, NUMBER, EQ,
-                              ARG, ARGLIST, ARGLIST_END, DONE };
+    enum class Option_State { MOD, HANDLES, EQ, ARG, ARGLIST,
+                              ARGLIST_END, DONE };
 
     bool verify_arg_type(const std::string& arg, Data_Prop prop) {
       DT_STATE state = DT_STATE::START;
@@ -185,7 +185,6 @@ namespace util {
     Option_State state = Option_State::MOD;
     option_t opt;
     std::vector<std::string> handles;
-    std::ostringstream buf;
     int spec_offset = 0;
 
     /* 
@@ -199,172 +198,8 @@ namespace util {
         state = process_MOD(spec, spec_offset, opt);
 
         break;
-      case Option_State::NONE:
-        if (spec[spec_offset] == '\0') {
-          state = Option_State::DONE;
-
-          break;
-        }
-
-        switch (spec[spec_offset]) {
-          case '/':
-          case '.':
-          case ':':
-            state = Option_State::PREFIX_END;
-
-            break;
-          case '+':
-            state = Option_State::PLUS_PREFIX;
-
-            break;
-          case '-':
-            state = Option_State::MINUS_PREFIX;
-
-            break;
-          default:
-            if (is_name_start_char(spec[spec_offset])) {
-              state = Option_State::NAME;
-            }
-            else {
-              throw option_language_error(std::string("expected prefix or word character"));
-            }
-
-            break;
-        }
-
-        buf << (spec[spec_offset]);
-
-        break;
-      case Option_State::MINUS_PREFIX:
-        if (spec[spec_offset] == '\0') {
-        throw option_language_error(std::string("input ended before handle complete"));
-        }
-
-        if (spec[spec_offset] == '-') {
-          state = Option_State::PREFIX_END;
-        }
-        else if (is_name_start_char(spec[spec_offset])) {
-          state = Option_State::NAME;
-        }
-        else {
-        throw option_language_error(std::string("input ended before handle complete"));
-        }
-
-        buf << (spec[spec_offset]);
-
-        break;
-      case Option_State::PLUS_PREFIX:
-        if (spec[spec_offset] == '\0') {
-        throw option_language_error(std::string("input ended before handle complete"));
-        }
-
-        if (spec[spec_offset] == '+') {
-          state = Option_State::PREFIX_END;
-        }
-        else if (is_name_start_char(spec[spec_offset])) {
-          state = Option_State::NAME;
-        }
-        else {
-        throw option_language_error(std::string("input ended before handle complete"));
-        }
-
-        break;
-      case Option_State::PREFIX_END:
-        if (spec[spec_offset] == '\0') {
-        throw option_language_error(std::string("input ended before hande complete"));
-        }
-
-        if (is_name_start_char(spec[spec_offset])) {
-          buf << (spec[spec_offset]);
-
-          state = Option_State::NAME;
-        }
-        else {
-        throw option_language_error(std::to_string(spec[spec_offset])
-            + std::string(" invalid character for handle name: can only take word characters and '-'"));
-        }
-
-        break;
-      case Option_State::NAME:
-        if (spec[spec_offset] == '\0') {
-          if (!buf.str().empty()) {
-            handles.push_back(buf.str());
-            buf.str("");
-          }
-
-          state = Option_State::DONE;
-
-          break;
-        }
-
-        switch (spec[spec_offset]) {
-        case '|':
-          handles.push_back(buf.str());
-          buf.str("");
-
-          state = Option_State::NONE;
-          break;
-        case '=':
-          handles.push_back(buf.str());
-          buf.str("");
-
-          state = Option_State::EQ;
-
-          opt.assignment = Assign_Prop::EQ_REQUIRED;
-          opt.collection = Collect_Prop::SCALAR;
-          break;
-        case '?':
-        handles.push_back(buf.str());
-        buf.str("");
-    
-        state = Option_State::NUMBER;
-    
-        opt.number = Num_Prop::ZERO_ONE;
-        break;
-        case '*':
-        handles.push_back(buf.str());
-        buf.str("");
-
-        state = Option_State::NUMBER;
-
-        opt.number = Num_Prop::ZERO_MANY;
-        break;
-        default:
-          if (is_name_rest_char(spec[spec_offset])) {
-            buf << (spec[spec_offset]);
-          }
-          else {
-          throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
-          }
-          break;
-        }
-
-        break;
-      case Option_State::NUMBER:
-        if (spec[spec_offset] == '\0') {
-          state = Option_State::DONE;
-
-          break;
-        }
-
-        handles.push_back(buf.str());
-        buf.str("");
-
-        if (spec[spec_offset] == '=') {
-          state = Option_State::EQ;
-
-          opt.assignment = Assign_Prop::EQ_REQUIRED;
-          opt.collection = Collect_Prop::SCALAR;
-        }
-        else if (spec[spec_offset] == '[') {
-          state = Option_State::ARGLIST;
-
-          opt.assignment = Assign_Prop::NO_ASSIGN;
-          opt.collection = Collect_Prop::LIST;
-        }
-        else {
-          throw option_language_error(std::string("expected '=' or '[' after number"));
-        }
+      case Option_State::HANDLES:
+        state = process_HANDLES(spec, spec_offset, opt, handles);
 
         break;
       case Option_State::EQ:
@@ -600,7 +435,7 @@ namespace util {
         else {
           spec_offset--;
 
-          return Option_State::NONE;
+          return Option_State::HANDLES;
         }
 
         break;
@@ -647,7 +482,7 @@ namespace util {
         }
 
         if (spec[spec_offset] == ']') {
-          return Option_State::NONE;
+          return Option_State::HANDLES;
         }
         else {
           throw option_language_error(std::string("expected ']' character"));
@@ -664,6 +499,187 @@ namespace util {
       }
     }
     }
+
+  Option_State opt_parser::process_HANDLES(const char * spec,
+                               int& spec_offset,
+                               option_t& opt,
+                               std::vector<std::string>& handles) {
+
+    std::ostringstream buf;
+    enum Handle_State { NAME, PREFIX_END, PLUS_PREFIX, MINUS_PREFIX,
+                        HANDLES, NUMBER } state = HANDLES;
+
+    while (true) {
+      switch(state) {
+      case HANDLES:
+        if (spec[spec_offset] == '\0') {
+          return Option_State::DONE;
+        }
+
+        switch (spec[spec_offset]) {
+        case '/':
+        case '.':
+        case ':':
+          state = PREFIX_END;
+
+          break;
+        case '+':
+          state = PLUS_PREFIX;
+
+          break;
+        case '-':
+          state = MINUS_PREFIX;
+
+          break;
+        default:
+          if (is_name_start_char(spec[spec_offset])) {
+            state = NAME;
+          }
+          else {
+            throw option_language_error(std::string("expected prefix or word character"));
+          }
+
+          break;
+        }
+
+        buf << (spec[spec_offset]);
+
+        break;
+      case MINUS_PREFIX:
+        if (spec[spec_offset] == '\0') {
+          throw option_language_error(std::string("input ended before handle complete"));
+        }
+
+        if (spec[spec_offset] == '-') {
+          state = PREFIX_END;
+        }
+        else if (is_name_start_char(spec[spec_offset])) {
+          state = NAME;
+        }
+        else {
+          throw option_language_error(std::string("input ended before handle complete"));
+        }
+
+        buf << (spec[spec_offset]);
+
+        break;
+      case PLUS_PREFIX:
+        if (spec[spec_offset] == '\0') {
+          throw option_language_error(std::string("input ended before handle complete"));
+        }
+
+        if (spec[spec_offset] == '+') {
+          state = PREFIX_END;
+        }
+        else if (is_name_start_char(spec[spec_offset])) {
+          state = NAME;
+        }
+        else {
+          throw option_language_error(std::string("input ended before handle complete"));
+        }
+
+        break;
+      case PREFIX_END:
+        if (spec[spec_offset] == '\0') {
+          throw option_language_error(std::string("input ended before hande complete"));
+        }
+
+        if (is_name_start_char(spec[spec_offset])) {
+          buf << (spec[spec_offset]);
+
+          state = NAME;
+        }
+        else {
+          throw option_language_error(std::to_string(spec[spec_offset])
+            + std::string(" invalid character for handle name: can only take word characters and '-'"));
+        }
+
+        break;
+      case NAME:
+        if (spec[spec_offset] == '\0') {
+          if (!buf.str().empty()) {
+            handles.push_back(buf.str());
+            buf.str("");
+          }
+
+          return Option_State::DONE;
+        }
+
+        switch (spec[spec_offset]) {
+        case '|':
+          handles.push_back(buf.str());
+          buf.str("");
+
+          state = HANDLES;
+          break;
+        case '=':
+          handles.push_back(buf.str());
+          buf.str("");
+
+          opt.assignment = Assign_Prop::EQ_REQUIRED;
+          opt.collection = Collect_Prop::SCALAR;
+
+          return Option_State::EQ;
+        case '?':
+          handles.push_back(buf.str());
+          buf.str("");
+    
+          state = NUMBER;
+    
+          opt.number = Num_Prop::ZERO_ONE;
+          break;
+        case '*':
+          handles.push_back(buf.str());
+          buf.str("");
+
+          state = NUMBER;
+
+          opt.number = Num_Prop::ZERO_MANY;
+          break;
+        default:
+          if (is_name_rest_char(spec[spec_offset])) {
+            buf << (spec[spec_offset]);
+          }
+          else {
+            throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
+          }
+          break;
+        }
+
+        break;
+      case NUMBER:
+        if (spec[spec_offset] == '\0') {
+          return Option_State::DONE;
+        }
+
+        handles.push_back(buf.str());
+        buf.str("");
+
+        if (spec[spec_offset] == '=') {
+          opt.assignment = Assign_Prop::EQ_REQUIRED;
+          opt.collection = Collect_Prop::SCALAR;
+
+          return Option_State::EQ;
+        }
+        else if (spec[spec_offset] == '[') {
+          opt.assignment = Assign_Prop::NO_ASSIGN;
+          opt.collection = Collect_Prop::LIST;
+
+          return Option_State::ARGLIST;
+        }
+        else {
+          throw option_language_error(std::string("expected '=' or '[' after number"));
+        }
+
+        break;
+      }
+      
+      if (spec[spec_offset] != '\0') {
+        spec_offset++;
+      }
+    }
+  }
+
 
   opt_info opt_parser::parse(char ** &argv, int argc) {
     opt_info info;
