@@ -9,6 +9,7 @@ t/data
 t/handles
 t/merged
 t/bsd
+t/stuck
 t/subcommand
 build/
 doc/man
