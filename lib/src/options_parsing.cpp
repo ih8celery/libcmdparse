@@ -210,6 +210,11 @@ namespace util {
         }
 
         switch (spec[spec_offset]) {
+          case '|':
+            opt.assignment = Assign_Prop::STUCK;
+            state = Option_State::ARG;
+
+            break;
           case '?':
             opt.assignment = Assign_Prop::EQ_MAYBE;
             state = Option_State::ARG;
@@ -374,7 +379,23 @@ namespace util {
           const std::set<option_t>::const_iterator
             name_iter = name_set.find(opt);
 
-          if (name_iter == name_set.cend()) { // name not found
+          if (name_iter == name_set.cend()) {
+            if (opt.assignment == Assign_Prop::STUCK) {
+              // no more than one handle
+              if (handles.size() > 1) {
+                throw option_language_error(std::string("option ")
+                    + "declared with STUCK assignment cannot have "
+                    + "multiple handles");
+              }
+
+              // handle must be of form /-[A-Z]/
+              if (!(handles[0][0] == '-' && isupper(handles[0][1]) && handles[0].size() == 2)) {
+                throw option_language_error(std::string("option declared ")
+                    + "with STUCK assignment must have single handle "
+                    + "of form /-[A-Z]/");
+              }
+            }
+
             // when name is not found, this option is being registered as new
             name_set.insert(opt);
 
@@ -389,6 +410,12 @@ namespace util {
             }
           }
           else { // found the name
+            /* may not declare multiple instances of a stuck argument */
+            if (opt.assignment == Assign_Prop::STUCK) {
+              throw option_language_error(std::string("option declared ")
+                  + "with STUCK assignment cannot have multiple handles");
+            }
+
             if (opt.compatible(*name_iter)) {
               // insert handles known with the option
               for (const std::string handle : handles) {
@@ -679,7 +706,6 @@ namespace util {
       }
     }
   }
-
 
   opt_info opt_parser::parse(char ** &argv, int argc) {
     opt_info info;

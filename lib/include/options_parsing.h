@@ -85,7 +85,8 @@ namespace util {
     NO_ASSIGN,   /// option may not take argument
     EQ_REQUIRED, /// option takes argument which must be delimited by '='
     EQ_MAYBE,    /// option takes argument which may or may not be delimited by '='
-    EQ_NEVER     /// option takes argument NOT delimited by '='
+    EQ_NEVER,    /// option takes argument NOT delimited by '='
+    STUCK        /// option takes an argument which is appended to the handle
   };
 
   /**
