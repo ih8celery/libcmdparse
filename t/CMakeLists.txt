@@ -24,6 +24,9 @@ target_link_libraries (bsd tap++ optparse)
 add_executable (subcommand "80-subcommands.cpp")
 target_link_libraries (subcommand tap++ optparse)
 
+add_executable (stuck "90-stuck-assignment.cpp")
+target_link_libraries (stuck tap++ optparse)
+
 set (CUSTOM_TEST_EXECUTABLES 
   "${EXECUTABLE_OUTPUT_PATH}/number" 
   "${EXECUTABLE_OUTPUT_PATH}/assignment" 
@@ -33,6 +36,7 @@ set (CUSTOM_TEST_EXECUTABLES
   "${EXECUTABLE_OUTPUT_PATH}/merged"
   "${EXECUTABLE_OUTPUT_PATH}/bsd"
   "${EXECUTABLE_OUTPUT_PATH}/subcommand"
+  "${EXECUTABLE_OUTPUT_PATH}/stuck"
   )
 
 add_custom_target (debug
@@ -46,3 +50,4 @@ add_test (NAME test_data COMMAND data)
 add_test (NAME test_merged COMMAND merged)
 add_test (NAME test_bsd COMMAND bsd)
 add_test (NAME test_sub COMMAND subcommand)
+add_test (NAME test_stuck COMMAND stuck)
