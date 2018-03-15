@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">liboptparse
-   &#160;<span id="projectnumber">0.3.0-1</span>
+   &#160;<span id="projectnumber">0.3.1-0</span>
    </div>
    <div id="projectbrief">command line option parsing with object-oriented interface</div>
   </td>
@@ -108,9 +108,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1opt__parser.html#a7c1bcd8e2587e349fa34f4066b849627">opt_parser</a> ()</td></tr>
 <tr class="memdesc:a7c1bcd8e2587e349fa34f4066b849627"><td class="mdescLeft">&#160;</td><td class="mdescRight">default constructor of class <a class="el" href="classutil_1_1opt__parser.html" title="class controlling option declaration and parsing ">opt_parser</a> <br /></td></tr>
 <tr class="separator:a7c1bcd8e2587e349fa34f4066b849627"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa75b9269bd3a65866b66021bab145880"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structutil_1_1option__t.html">option_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1opt__parser.html#aa75b9269bd3a65866b66021bab145880">option</a> (const std::string &amp;, const std::string &amp;=&quot;&quot;)</td></tr>
-<tr class="memdesc:aa75b9269bd3a65866b66021bab145880"><td class="mdescLeft">&#160;</td><td class="mdescRight">declare an option to the parser  <a href="#aa75b9269bd3a65866b66021bab145880">More...</a><br /></td></tr>
-<tr class="separator:aa75b9269bd3a65866b66021bab145880"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c17180233319c83591f36d7c28d6e95"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structutil_1_1option__t.html">option_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1opt__parser.html#a6c17180233319c83591f36d7c28d6e95">option</a> (const char *, const std::string &amp;=&quot;&quot;)</td></tr>
+<tr class="memdesc:a6c17180233319c83591f36d7c28d6e95"><td class="mdescLeft">&#160;</td><td class="mdescRight">declare an option to the parser  <a href="#a6c17180233319c83591f36d7c28d6e95">More...</a><br /></td></tr>
+<tr class="separator:a6c17180233319c83591f36d7c28d6e95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28452f4bc2b8809dd5c298250d64801e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classutil_1_1opt__info.html">opt_info</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1opt__parser.html#a28452f4bc2b8809dd5c298250d64801e">parse</a> (char **&amp;argv, int argc)</td></tr>
 <tr class="memdesc:a28452f4bc2b8809dd5c298250d64801e"><td class="mdescLeft">&#160;</td><td class="mdescRight">extract options from argv into an <a class="el" href="classutil_1_1opt__info.html" title="represents data collected during parsing ">opt_info</a> object  <a href="#a28452f4bc2b8809dd5c298250d64801e">More...</a><br /></td></tr>
 <tr class="separator:a28452f4bc2b8809dd5c298250d64801e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,7 +141,7 @@ std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bott
 <tr class="separator:af32ae35469cad5575dfffe61dffd7515"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa53f0449c70d32b39a655a16d5ffc99d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa53f0449c70d32b39a655a16d5ffc99d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1opt__parser.html#aa53f0449c70d32b39a655a16d5ffc99d">clear_options</a> ()</td></tr>
-<tr class="memdesc:aa53f0449c70d32b39a655a16d5ffc99d"><td class="mdescLeft">&#160;</td><td class="mdescRight">clear the data collected from calls to <a class="el" href="classutil_1_1opt__parser.html#aa75b9269bd3a65866b66021bab145880" title="declare an option to the parser ">option()</a> <br /></td></tr>
+<tr class="memdesc:aa53f0449c70d32b39a655a16d5ffc99d"><td class="mdescLeft">&#160;</td><td class="mdescRight">clear the data collected from calls to <a class="el" href="classutil_1_1opt__parser.html#a6c17180233319c83591f36d7c28d6e95" title="declare an option to the parser ">option()</a> <br /></td></tr>
 <tr class="separator:aa53f0449c70d32b39a655a16d5ffc99d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82aea44471ed1275097700a4e291ddf2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a82aea44471ed1275097700a4e291ddf2"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutil_1_1opt__parser.html#a82aea44471ed1275097700a4e291ddf2">handle_has_name</a> (const std::string &amp;handle, const std::string &amp;name) const </td></tr>
@@ -151,14 +151,14 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>class controlling option declaration and parsing </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aa75b9269bd3a65866b66021bab145880"></a>
+<a class="anchor" id="a6c17180233319c83591f36d7c28d6e95"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="structutil_1_1option__t.html">option_t</a> util::opt_parser::option </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>spec</em>, </td>
         </tr>
         <tr>
@@ -212,7 +212,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
  argv and replaced with nullptr. <br />
  throws a <a class="el" href="classutil_1_1parse__error.html" title="thrown during parsing ">parse_error</a> if something goes wrong <br />
  </p>
-<p>this is the only <a class="el" href="classutil_1_1option__language__error.html" title="thrown when options declared or, in one case, at the start of parsing ">option_language_error</a> thrown in the parse member function because calling this function is the only way to signify the end of option declarations. as stated in a previous comment, it is an error for subcommands to be enabled but not declared by calls to <a class="el" href="classutil_1_1opt__parser.html#aa75b9269bd3a65866b66021bab145880" title="declare an option to the parser ">option()</a></p>
+<p>this is the only <a class="el" href="classutil_1_1option__language__error.html" title="thrown when options declared or, in one case, at the start of parsing ">option_language_error</a> thrown in the parse member function because calling this function is the only way to signify the end of option declarations. as stated in a previous comment, it is an error for subcommands to be enabled but not declared by calls to <a class="el" href="classutil_1_1opt__parser.html#a6c17180233319c83591f36d7c28d6e95" title="declare an option to the parser ">option()</a></p>
 
 </div>
 </div>
