@@ -389,7 +389,7 @@ namespace util {
               }
 
               // handle must be of form /-[A-Z]/
-              if (!(handles[0][0] == '-' && isupper(handles[0][1]) && handles[0].size() == 2)) {
+              if (!(handles[0].size() == 2 && handles[0][0] == '-' && isupper(handles[0][1]))) {
                 throw option_language_error(std::string("option declared ")
                     + "with STUCK assignment must have single handle "
                     + "of form /-[A-Z]/");
@@ -525,7 +525,7 @@ namespace util {
         spec_offset++;
       }
     }
-    }
+  }
 
   Option_State opt_parser::process_HANDLES(const char * spec,
                                int& spec_offset,
@@ -805,11 +805,35 @@ namespace util {
           iter = handle_map.find(handle);
         }
         else {
-          if (!is_case_sensitive){
-            // TODO use lowercase
+          if (handle.size() >= 2 && handle[0] == '-' && isupper(handle[1])) {
+            iter = handle_map.find(handle.substr(0, 2));
           }
 
-          iter = handle_map.find(handle);
+          if (is_case_sensitive) {
+            if (handle.size() >= 2 && handle[0] == '-' && isupper(handle[1])) {
+              iter = handle_map.find(handle.substr(0, 2));
+
+              if (iter == handle_map.cend()) {
+                iter = handle_map.find(handle);
+              }
+            }
+            else {
+              iter = handle_map.find(handle);
+            }
+          }
+          else {
+            if (handle.size() >= 2 && handle[0] == '-' && isupper(handle[1])) {
+              iter = handle_map.find(handle.substr(0, 2));
+
+              if (iter == handle_map.cend()) {
+                iter = handle_map.find(handle);
+              }
+            }
+            else {
+              // TODO use lowercase
+              iter = handle_map.find(handle);
+            }
+          }
         }
       }
       else {
@@ -882,7 +906,7 @@ namespace util {
               args = handle.substr(eq_loc+1);
             }
           }
-          else {
+          else if (opt.assignment == Assign_Prop::EQ_NEVER) {
             if (eq_loc == std::string::npos) {
               if (++i < argc) {
                 args = argv[i];
@@ -896,6 +920,14 @@ namespace util {
               throw parse_error(std::string("option with handle '")
                   + handle + "' should not use an equals sign");
             }
+          }
+          else {
+            if (handle.size() < 3) {
+              throw parse_error(std::string("option declared with ")
+                  + "stuck assignment must have an argument");
+            }
+
+            args = handle.substr(2);
           }
 
           if (opt.collection == Collect_Prop::SCALAR) {

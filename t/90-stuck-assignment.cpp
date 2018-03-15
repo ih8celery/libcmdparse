@@ -32,9 +32,8 @@ int main() {
   char ** argv = new char*[1];
   argv[0] = (char *)"-Similar";
 
-  // info = p.parse(argv, 1);
+  info = p.parse(argv, 1);
 
-  todo(2, "Parsing of stuck arguments not implemented");
   ok(info.has("stuck"), "found 'stuck' in argv");
   ok(info.arg("stuck", "none") == "imilar", "found 'stuck' argument");
 
