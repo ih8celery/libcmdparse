@@ -8,7 +8,7 @@
 #include "options_parsing.h"
 #include <sstream>
 #include <cctype>
-//#include <iostream>
+#include <iostream>
 
 namespace {
   inline bool is_prefix_char(char ch) {
@@ -22,6 +22,64 @@ namespace {
 
   inline bool is_name_rest_char(char ch) {
     return (is_name_start_char(ch) || ch == '-');
+  }
+
+  std::string strtolower(const std::string& str) {
+    std::string result(str);
+
+    for (char& ch : result) {
+      ch = tolower(ch);
+    }
+
+    return result;
+  }
+
+
+
+  int skip_prefix(const std::string& in) {
+    enum Prefix_State { NONE, MINUS, PLUS, END } state = NONE;
+
+    for (int i = 0; i < in.size(); ++i) {
+      if (!is_prefix_char(in[i])) {
+        return i;
+      }
+
+      switch (state) {
+      case NONE:
+        if (in[i] == '-') {
+          state = MINUS;
+          break;
+        }
+        else if (in[i] == '+') {
+          state = PLUS;
+          break;
+        }
+        else {
+          state = END;
+          break;
+        }
+      case MINUS:
+        if (in[i] == '-') {
+          state = END;
+          break;
+        }
+        else {
+          throw util::parse_error(std::string("invalid prefix"));
+        }
+      case PLUS:
+        if (in[i] == '+') {
+          state = END;
+          break;
+        }
+        else {
+          throw util::parse_error(std::string("invalid prefix"));
+        }
+      case END:
+        throw util::parse_error(std::string("invalid prefix"));
+      }
+    }
+
+    return 0;
   }
 }
 
@@ -734,25 +792,18 @@ namespace util {
       // get the handle
       if (eq_loc == std::string::npos) {
         if (i == 0 && (is_bsd_opt_enabled || is_merged_opt_enabled)) {
-          bool prefix_done = false;
           bool accepted_first_special = false;
 
           char mini_handle;
 
           for (int j = 0; j < handle.size(); ++j) {
             // eliminate any prefix characters
-            while (j < 2 && !prefix_done) {
-              prefix_done = !(is_prefix_char(handle[j]));
-
-              ++j;
-
-              if (!prefix_done && !is_merged_opt_enabled) {
-                throw parse_error(std::string("bsd-style options may not use a prefix"));
-              }
-
-              if (prefix_done) {
-                j--;
-                break;
+            if (j == 0) {
+              j = skip_prefix(handle);
+              
+              if (is_bsd_opt_enabled && j > 0) {
+                throw parse_error(std::string("bsd-style options may ")
+                    + "not use a prefix");
               }
             }
 
@@ -805,10 +856,6 @@ namespace util {
           iter = handle_map.find(handle);
         }
         else {
-          if (handle.size() >= 2 && handle[0] == '-' && isupper(handle[1])) {
-            iter = handle_map.find(handle.substr(0, 2));
-          }
-
           if (is_case_sensitive) {
             if (handle.size() >= 2 && handle[0] == '-' && isupper(handle[1])) {
               iter = handle_map.find(handle.substr(0, 2));
@@ -822,28 +869,23 @@ namespace util {
             }
           }
           else {
-            if (handle.size() >= 2 && handle[0] == '-' && isupper(handle[1])) {
-              iter = handle_map.find(handle.substr(0, 2));
-
-              if (iter == handle_map.cend()) {
-                iter = handle_map.find(handle);
-              }
-            }
-            else {
-              // TODO use lowercase
-              iter = handle_map.find(handle);
-            }
+            iter = handle_map.find(strtolower(handle));
           }
         }
       }
       else {
-        iter = handle_map.find(handle.substr(0, eq_loc));
-
         if (i == 0 && (is_subcommand_enabled
             || is_bsd_opt_enabled
             || is_merged_opt_enabled)) {
         
           throw parse_error(std::string("special options may not take arguments"));
+        }
+        
+        if (is_case_sensitive) {
+          iter = handle_map.find(handle.substr(0, eq_loc));
+        }
+        else {
+          iter = handle_map.find(strtolower(handle.substr(0, eq_loc)));
         }
       }
  

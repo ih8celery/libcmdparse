@@ -10,7 +10,7 @@
 #include <tap++.h>
 #include "options_parsing.h"
 
-constexpr int ARGC = 4;
+constexpr int ARGC = 5;
 
 using namespace TAP;
 
@@ -19,6 +19,8 @@ int main () {
 
   util::opt_parser parser;
   util::option_t opt;
+
+  parser.set(util::config_constants::case_sensitive, false);
 
   // definition of option/name
   opt = parser.option("--has-opt*", "name");
@@ -53,12 +55,13 @@ int main () {
   args[1] = (char*)"--is-option";
   args[2] = (char*)"--has-opt";
   args[3] = (char*)"-repeat";
+  args[4] = (char*)"-REPEAT";
 
-  auto info = parser.parse(args, ARGC);
+  util::opt_info info = parser.parse(args, ARGC);
 
   ok(info.has("NAME"), "--is-option handle used");
 
-  ok(info.count("name") == 2, "option with name 'name' used twice");
+  ok(info.count("name") == 3, "option with name 'name' used thrice");
 
   done_testing();
 
