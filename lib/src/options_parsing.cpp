@@ -34,8 +34,6 @@ namespace {
     return result;
   }
 
-
-
   int skip_prefix(const std::string& in) {
     enum Prefix_State { NONE, MINUS, PLUS, END } state = NONE;
 
@@ -666,7 +664,7 @@ namespace util {
         break;
       case PREFIX_END:
         if (spec[spec_offset] == '\0') {
-          throw option_language_error(std::string("input ended before hande complete"));
+          throw option_language_error(std::string("input ended before handle complete"));
         }
 
         if (is_name_start_char(spec[spec_offset])) {
@@ -769,8 +767,7 @@ namespace util {
     opt_info info;
     std::string::size_type eq_loc;
     option_t opt;
-    std::string args;
-    const std::string default_data = "1";
+    std::string args("1");
 
     /** 
      * this is the only option_language_error thrown in the parse
@@ -840,7 +837,7 @@ namespace util {
                   throw parse_error(std::string("option repeated more than allowed"));
                 }
 
-                info.opt_data.insert(std::make_pair(opt.name, default_data));
+                info.opt_data.insert(std::make_pair(opt.name, args));
                 accepted_first_special = true;
               }
               else {
@@ -916,7 +913,7 @@ namespace util {
         else {
           if (opt.assignment == Assign_Prop::NO_ASSIGN) {
             if (eq_loc == std::string::npos) {
-              info.opt_data.insert(std::make_pair(opt.name, default_data));
+              info.opt_data.insert(std::make_pair(opt.name, args));
             }
             else {
               throw parse_error(std::string("option with handle '")
