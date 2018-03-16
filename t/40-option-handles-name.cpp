@@ -10,12 +10,12 @@
 #include <tap++.h>
 #include "options_parsing.h"
 
-constexpr int ARGC = 5;
+constexpr int ARGC = 8;
 
 using namespace TAP;
 
 int main () {
-  plan(12);
+  plan(13);
 
   util::opt_parser parser;
   util::option_t opt;
@@ -56,6 +56,9 @@ int main () {
   args[2] = (char*)"--has-opt";
   args[3] = (char*)"-repeat";
   args[4] = (char*)"-REPEAT";
+  args[5] = (char*)"-";
+  args[6] = (char*)"-repeat";
+  args[7] = (char*)"--is-option";
 
   util::opt_info info = parser.parse(args, ARGC);
 
@@ -63,8 +66,11 @@ int main () {
 
   ok(info.count("name") == 3, "option with name 'name' used thrice");
 
-  done_testing();
+  ok(info.rest.size() == 3, "EOI detected");
 
   delete [] args;
+
+  done_testing();
+
   return exit_status();
 }
