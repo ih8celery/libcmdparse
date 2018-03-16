@@ -783,6 +783,20 @@ namespace util {
     /* loop over all the words in argv */
     for (int i = 0; i < argc; ++i) {
       std::string handle = argv[i];
+
+      // check for End-Of-Input as either '-' or '--'
+      if ((handle.size() == 1 && handle[0] == '-')
+          || (handle.size() == 2 && handle[0] == '-' && handle[1] == '-')) {
+
+        ++i;
+
+        while (i < argc) {
+          info.rest.emplace_back(argv[i++]);
+        }
+
+        return info;
+      }
+
       eq_loc = handle.find_first_of('=');
       std::unordered_map<std::string, option_t>::const_iterator iter;
 
