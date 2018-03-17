@@ -109,7 +109,7 @@ this scenario.
 
     return iterators denoting range of values stored under option name
 
-  `std::vector<std::string> rem`
+  `std::vector<std::string> rest`
 
     contains the non-option strings from the parsing source
 
