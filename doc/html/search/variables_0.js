@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rem',['rem',['../classutil_1_1opt__info.html#a5bb0bee449464874cec62c729423628f',1,'util::opt_info']]]
+  ['rest',['rest',['../classutil_1_1opt__info.html#a49006ca159d0fddada1e1dfe8722a74c',1,'util::opt_info']]]
 ];

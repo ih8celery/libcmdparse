@@ -1,4 +1,4 @@
-liboptparse version 0.3.0-1
+liboptparse version 0.3.1-0
 
 # What is liboptparse?
   liboptparse is a simple library for command line argument parsing.
@@ -109,7 +109,7 @@ this scenario.
 
     return iterators denoting range of values stored under option name
 
-  `std::vector<std::string> rem`
+  `std::vector<std::string> rest`
 
     contains the non-option strings from the parsing source
 

@@ -8,6 +8,7 @@
 #include "options_parsing.h"
 #include <sstream>
 #include <cctype>
+#include <iostream>
 
 namespace {
   inline bool is_prefix_char(char ch) {
@@ -21,6 +22,62 @@ namespace {
 
   inline bool is_name_rest_char(char ch) {
     return (is_name_start_char(ch) || ch == '-');
+  }
+
+  std::string strtolower(const std::string& str) {
+    std::string result(str);
+
+    for (char& ch : result) {
+      ch = tolower(ch);
+    }
+
+    return result;
+  }
+
+  int skip_prefix(const std::string& in) {
+    enum Prefix_State { NONE, MINUS, PLUS, END } state = NONE;
+
+    for (int i = 0; i < in.size(); ++i) {
+      if (!is_prefix_char(in[i])) {
+        return i;
+      }
+
+      switch (state) {
+      case NONE:
+        if (in[i] == '-') {
+          state = MINUS;
+          break;
+        }
+        else if (in[i] == '+') {
+          state = PLUS;
+          break;
+        }
+        else {
+          state = END;
+          break;
+        }
+      case MINUS:
+        if (in[i] == '-') {
+          state = END;
+          break;
+        }
+        else {
+          throw util::parse_error(std::string("invalid prefix"));
+        }
+      case PLUS:
+        if (in[i] == '+') {
+          state = END;
+          break;
+        }
+        else {
+          throw util::parse_error(std::string("invalid prefix"));
+        }
+      case END:
+        throw util::parse_error(std::string("invalid prefix"));
+      }
+    }
+
+    return 0;
   }
 }
 
@@ -67,6 +124,9 @@ namespace util {
       DOT,
       END
     };
+
+    enum class Option_State { MOD, HANDLES, EQ, ARG, ARGLIST,
+                              ARGLIST_END, DONE };
 
     bool verify_arg_type(const std::string& arg, Data_Prop prop) {
       DT_STATE state = DT_STATE::START;
@@ -168,7 +228,7 @@ namespace util {
 
       return true;
     }
-  }
+   }
 
   opt_parser::opt_parser() : is_case_sensitive(true),
                              is_bsd_opt_enabled(false),
@@ -178,13 +238,9 @@ namespace util {
                              is_mod_found(false) {}
 
   option_t opt_parser::option(const char * spec, const std::string& name) {
-    enum Option_State { MOD, MOD_FN, MOD_ARG, MOD_END, NONE, PREFIX_END,
-                        PLUS_PREFIX, MINUS_PREFIX, NAME, NUMBER, EQ,
-                        ARG, ARGLIST, ARGLIST_END, DONE } state = MOD;
-
+    Option_State state = Option_State::MOD;
     option_t opt;
     std::vector<std::string> handles;
-    std::ostringstream buf;
     int spec_offset = 0;
 
     /* 
@@ -194,11 +250,266 @@ namespace util {
     while (true) {
       /* execute code on the state of the option parser */
       switch(state) {
-      case MOD:
+      case Option_State::MOD:
+        state = process_MOD(spec, spec_offset, opt);
+
+        break;
+      case Option_State::HANDLES:
+        state = process_HANDLES(spec, spec_offset, opt, handles);
+
+        break;
+      case Option_State::EQ:
         if (spec[spec_offset] == '\0') {
-          state = DONE;
+          state = Option_State::DONE;
 
           break;
+        }
+
+        switch (spec[spec_offset]) {
+          case '|':
+            opt.assignment = Assign_Prop::STUCK;
+            state = Option_State::ARG;
+
+            break;
+          case '?':
+            opt.assignment = Assign_Prop::EQ_MAYBE;
+            state = Option_State::ARG;
+
+            break;
+          case '!':
+            opt.assignment = Assign_Prop::EQ_NEVER;
+            state = Option_State::ARG;
+
+            break;
+          case '[':
+            state = Option_State::ARGLIST;
+            opt.collection = Collect_Prop::LIST;
+            opt.assignment = Assign_Prop::EQ_REQUIRED;
+
+            break;
+          case 's':
+            opt.data_type = Data_Prop::STRING;
+            state = Option_State::DONE;
+
+            break;
+          case 'i':
+            opt.data_type = Data_Prop::INTEGER;
+            state = Option_State::DONE;
+
+            break;
+          case 'f':
+            opt.data_type = Data_Prop::FLOAT;
+            state = Option_State::DONE;
+
+            break;
+          default:
+          throw option_language_error(std::string(
+                        "expected eq modifier or arg spec"));
+            break;
+        }
+
+        break;
+      case Option_State::ARG:
+        if (spec[spec_offset] == '\0') {
+          opt.data_type = Data_Prop::STRING;
+          state = Option_State::DONE;
+
+          break;
+        }
+
+        switch (spec[spec_offset]) {
+          case '[':
+            state = Option_State::ARGLIST;
+            opt.collection = Collect_Prop::LIST;
+
+            break;
+          case 's':
+            opt.data_type = Data_Prop::STRING;
+            state = Option_State::DONE;
+
+            break;
+          case 'i':
+            opt.data_type = Data_Prop::INTEGER;
+            state = Option_State::DONE;
+
+            break;
+          case 'f':
+            opt.data_type = Data_Prop::FLOAT;
+            state = Option_State::DONE;
+
+            break;
+          default:
+          throw option_language_error(std::string(
+                        "expected arg type or start of arg list"));
+            break;
+        }
+
+        break;
+      case Option_State::ARGLIST:
+        if (spec[spec_offset] == '\0') {
+        throw option_language_error(std::string(
+                      "input ended in arg list"));
+        }
+
+        switch (spec[spec_offset]) {
+          case 's':
+            opt.data_type = Data_Prop::STRING;
+            state = Option_State::ARGLIST_END;
+
+            break;
+          case 'i':
+            opt.data_type = Data_Prop::INTEGER;
+            state = Option_State::ARGLIST_END;
+
+            break;
+          case 'f':
+            opt.data_type = Data_Prop::FLOAT;
+            state = Option_State::ARGLIST_END;
+
+            break;
+          case ']':
+            opt.data_type = Data_Prop::STRING;
+            state = Option_State::DONE;
+
+            break;
+          default:
+          throw option_language_error(std::string(
+                        "expected arg type or end of arg list"));
+            break;
+        }
+
+        break;
+      case Option_State::ARGLIST_END:
+        if (spec[spec_offset] == '\0') {
+        throw option_language_error(std::string(
+                      "input ended before arg list finished"));
+        }
+
+        if (spec[spec_offset] == ']') {
+          state = Option_State::DONE;
+        }
+        else {
+        throw option_language_error(std::string(
+                      "expected ']' to conclude arg list"));
+        }
+
+        break;
+      case Option_State::DONE:
+        if (spec[spec_offset] != '\0') {
+          throw option_language_error(std::string("input found after option spec parsed"));
+        }
+        else {
+          if (handles.empty()) {
+            throw option_language_error(std::string("no handles found in option spec"));
+          }
+
+          if (name.empty()) {
+            std::string& maybe_name = handles.back();
+            std::string::size_type ind = 0;
+            
+            if (is_name_start_char(maybe_name[0])) {
+              ind = 0;
+            }
+            else if (is_name_start_char(maybe_name[1])) {
+              ind = 1;
+            }
+            else {
+              ind = 2;
+            }
+          
+            if (maybe_name.size() == ind + 1) { // NOTE: this situation should never happen
+              throw option_language_error(std::string("handle minus prefix is the empty string"));
+            }
+            else {
+              opt.name = handles.back().substr(ind);
+            }
+          }
+          else {
+            opt.name = name;
+          }
+
+          /*
+           * if name already exists, do not insert name -> option_t
+           * and throw if existing option_t is not equal to *opt.
+           */
+          const std::set<option_t>::const_iterator
+            name_iter = name_set.find(opt);
+
+          if (name_iter == name_set.cend()) {
+            if (opt.assignment == Assign_Prop::STUCK) {
+              // no more than one handle
+              if (handles.size() > 1) {
+                throw option_language_error(std::string("option ")
+                    + "declared with STUCK assignment cannot have "
+                    + "multiple handles");
+              }
+
+              // handle must be of form /-[A-Z]/
+              if (!(handles[0].size() == 2 && handles[0][0] == '-' && isupper(handles[0][1]))) {
+                throw option_language_error(std::string("option declared ")
+                    + "with STUCK assignment must have single handle "
+                    + "of form /-[A-Z]/");
+              }
+            }
+
+            // when name is not found, this option is being registered as new
+            name_set.insert(opt);
+
+            // insert handles known with the option
+            for (const std::string handle : handles) {
+              if (handle_map.find(handle) == handle_map.cend()) {
+                handle_map.insert(std::make_pair(handle, opt));
+              }
+              else {
+                throw option_language_error(std::string("handle repeated: ") + handle);
+              }
+            }
+          }
+          else { // found the name
+            /* may not declare multiple instances of a stuck argument */
+            if (opt.assignment == Assign_Prop::STUCK) {
+              throw option_language_error(std::string("option declared ")
+                  + "with STUCK assignment cannot have multiple handles");
+            }
+
+            if (opt.compatible(*name_iter)) {
+              // insert handles known with the option
+              for (const std::string handle : handles) {
+                if (handle_map.find(handle) == handle_map.cend()) {
+                  handle_map.insert(std::make_pair(handle, opt));
+                }
+                else {
+                  throw option_language_error(std::string("handle repeated: ") + handle);
+                }
+              }
+            }
+            else {
+              throw option_language_error(std::string("options with same name must be compatible: ") + opt.name);
+            }
+          }
+        }
+
+        return opt;
+      }
+
+      if (spec_offset < 0) {
+        spec_offset = 0;
+      }
+      else if (spec[spec_offset] != '\0'){
+        spec_offset++;
+      }
+    }
+  }
+    
+  Option_State opt_parser::process_MOD(const char * spec, int& spec_offset, option_t& opt) {
+    enum Mod_State { MOD_START, MOD_FN, MOD_ARG, MOD_END }
+      state = MOD_START;
+
+    while (true) {
+      switch(state) {
+      case MOD_START:
+        if (spec[spec_offset] == '\0') {
+          throw option_language_error(std::string("input ended before parsing finished"));
         }
 
         if (spec[spec_offset] == '[') {
@@ -207,7 +518,7 @@ namespace util {
         else {
           spec_offset--;
 
-          state = NONE;
+          return Option_State::HANDLES;
         }
 
         break;
@@ -254,44 +565,64 @@ namespace util {
         }
 
         if (spec[spec_offset] == ']') {
-          state = NONE;
+          return Option_State::HANDLES;
         }
         else {
           throw option_language_error(std::string("expected ']' character"));
         }
 
         break;
-      case NONE:
-        if (spec[spec_offset] == '\0') {
-          state = DONE;
+      }
 
-          break;
+      if (spec[spec_offset] == '\0') {
+        throw option_language_error(std::string("input finished before parsing finished"));
+      }
+      else {
+        spec_offset++;
+      }
+    }
+  }
+
+  Option_State opt_parser::process_HANDLES(const char * spec,
+                               int& spec_offset,
+                               option_t& opt,
+                               std::vector<std::string>& handles) {
+
+    std::ostringstream buf;
+    enum Handle_State { NAME, PREFIX_END, PLUS_PREFIX, MINUS_PREFIX,
+                        HANDLES, NUMBER } state = HANDLES;
+
+    while (true) {
+      switch(state) {
+      case HANDLES:
+        if (spec[spec_offset] == '\0') {
+          return Option_State::DONE;
         }
 
         switch (spec[spec_offset]) {
-          case '/':
-          case '.':
-          case ':':
-            state = PREFIX_END;
+        case '/':
+        case '.':
+        case ':':
+          state = PREFIX_END;
 
-            break;
-          case '+':
-            state = PLUS_PREFIX;
+          break;
+        case '+':
+          state = PLUS_PREFIX;
 
-            break;
-          case '-':
-            state = MINUS_PREFIX;
+          break;
+        case '-':
+          state = MINUS_PREFIX;
 
-            break;
-          default:
-            if (is_name_start_char(spec[spec_offset])) {
-              state = NAME;
-            }
-            else {
-              throw option_language_error(std::string("expected prefix or word character"));
-            }
+          break;
+        default:
+          if (is_name_start_char(spec[spec_offset])) {
+            state = NAME;
+          }
+          else {
+            throw option_language_error(std::string("expected prefix or word character"));
+          }
 
-            break;
+          break;
         }
 
         buf << (spec[spec_offset]);
@@ -299,7 +630,7 @@ namespace util {
         break;
       case MINUS_PREFIX:
         if (spec[spec_offset] == '\0') {
-        throw option_language_error(std::string("input ended before handle complete"));
+          throw option_language_error(std::string("input ended before handle complete"));
         }
 
         if (spec[spec_offset] == '-') {
@@ -309,7 +640,7 @@ namespace util {
           state = NAME;
         }
         else {
-        throw option_language_error(std::string("input ended before handle complete"));
+          throw option_language_error(std::string("input ended before handle complete"));
         }
 
         buf << (spec[spec_offset]);
@@ -317,7 +648,7 @@ namespace util {
         break;
       case PLUS_PREFIX:
         if (spec[spec_offset] == '\0') {
-        throw option_language_error(std::string("input ended before handle complete"));
+          throw option_language_error(std::string("input ended before handle complete"));
         }
 
         if (spec[spec_offset] == '+') {
@@ -327,13 +658,13 @@ namespace util {
           state = NAME;
         }
         else {
-        throw option_language_error(std::string("input ended before handle complete"));
+          throw option_language_error(std::string("input ended before handle complete"));
         }
 
         break;
       case PREFIX_END:
         if (spec[spec_offset] == '\0') {
-        throw option_language_error(std::string("input ended before hande complete"));
+          throw option_language_error(std::string("input ended before handle complete"));
         }
 
         if (is_name_start_char(spec[spec_offset])) {
@@ -342,7 +673,7 @@ namespace util {
           state = NAME;
         }
         else {
-        throw option_language_error(std::to_string(spec[spec_offset])
+          throw option_language_error(std::to_string(spec[spec_offset])
             + std::string(" invalid character for handle name: can only take word characters and '-'"));
         }
 
@@ -354,9 +685,7 @@ namespace util {
             buf.str("");
           }
 
-          state = DONE;
-
-          break;
+          return Option_State::DONE;
         }
 
         switch (spec[spec_offset]) {
@@ -364,39 +693,38 @@ namespace util {
           handles.push_back(buf.str());
           buf.str("");
 
-          state = NONE;
+          state = HANDLES;
           break;
         case '=':
           handles.push_back(buf.str());
           buf.str("");
 
-          state = EQ;
-
           opt.assignment = Assign_Prop::EQ_REQUIRED;
           opt.collection = Collect_Prop::SCALAR;
-          break;
+
+          return Option_State::EQ;
         case '?':
-        handles.push_back(buf.str());
-        buf.str("");
+          handles.push_back(buf.str());
+          buf.str("");
     
-        state = NUMBER;
+          state = NUMBER;
     
-        opt.number = Num_Prop::ZERO_ONE;
-        break;
+          opt.number = Num_Prop::ZERO_ONE;
+          break;
         case '*':
-        handles.push_back(buf.str());
-        buf.str("");
+          handles.push_back(buf.str());
+          buf.str("");
 
-        state = NUMBER;
+          state = NUMBER;
 
-        opt.number = Num_Prop::ZERO_MANY;
-        break;
+          opt.number = Num_Prop::ZERO_MANY;
+          break;
         default:
           if (is_name_rest_char(spec[spec_offset])) {
             buf << (spec[spec_offset]);
           }
           else {
-          throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
+            throw option_language_error(std::string("invalid character for handle name: can only take word characters and '-'"));
           }
           break;
         }
@@ -404,242 +732,32 @@ namespace util {
         break;
       case NUMBER:
         if (spec[spec_offset] == '\0') {
-          state = DONE;
-
-          break;
+          return Option_State::DONE;
         }
 
         handles.push_back(buf.str());
         buf.str("");
 
         if (spec[spec_offset] == '=') {
-          state = EQ;
-
           opt.assignment = Assign_Prop::EQ_REQUIRED;
           opt.collection = Collect_Prop::SCALAR;
+
+          return Option_State::EQ;
         }
         else if (spec[spec_offset] == '[') {
-          state = ARGLIST;
-
           opt.assignment = Assign_Prop::NO_ASSIGN;
           opt.collection = Collect_Prop::LIST;
+
+          return Option_State::ARGLIST;
         }
         else {
           throw option_language_error(std::string("expected '=' or '[' after number"));
         }
 
         break;
-      case EQ:
-        if (spec[spec_offset] == '\0') {
-          state = DONE;
-
-          break;
-        }
-
-        switch (spec[spec_offset]) {
-          case '?':
-            opt.assignment = Assign_Prop::EQ_MAYBE;
-            state = ARG;
-
-            break;
-          case '!':
-            opt.assignment = Assign_Prop::EQ_NEVER;
-            state = ARG;
-
-            break;
-          case '[':
-            state = ARGLIST;
-            opt.collection = Collect_Prop::LIST;
-            opt.assignment = Assign_Prop::EQ_REQUIRED;
-
-            break;
-          case 's':
-            opt.data_type = Data_Prop::STRING;
-            state = DONE;
-
-            break;
-          case 'i':
-            opt.data_type = Data_Prop::INTEGER;
-            state = DONE;
-
-            break;
-          case 'f':
-            opt.data_type = Data_Prop::FLOAT;
-            state = DONE;
-
-            break;
-          default:
-          throw option_language_error(std::string(
-                        "expected eq modifier or arg spec"));
-            break;
-        }
-
-        break;
-      case ARG:
-        if (spec[spec_offset] == '\0') {
-          opt.data_type = Data_Prop::STRING;
-          state = DONE;
-
-          break;
-        }
-
-        switch (spec[spec_offset]) {
-          case '[':
-            state = ARGLIST;
-            opt.collection = Collect_Prop::LIST;
-
-            break;
-          case 's':
-            opt.data_type = Data_Prop::STRING;
-            state = DONE;
-
-            break;
-          case 'i':
-            opt.data_type = Data_Prop::INTEGER;
-            state = DONE;
-
-            break;
-          case 'f':
-            opt.data_type = Data_Prop::FLOAT;
-            state = DONE;
-
-            break;
-          default:
-          throw option_language_error(std::string(
-                        "expected arg type or start of arg list"));
-            break;
-        }
-
-        break;
-      case ARGLIST:
-        if (spec[spec_offset] == '\0') {
-        throw option_language_error(std::string(
-                      "input ended in arg list"));
-        }
-
-        switch (spec[spec_offset]) {
-          case 's':
-            opt.data_type = Data_Prop::STRING;
-            state = ARGLIST_END;
-
-            break;
-          case 'i':
-            opt.data_type = Data_Prop::INTEGER;
-            state = ARGLIST_END;
-
-            break;
-          case 'f':
-            opt.data_type = Data_Prop::FLOAT;
-            state = ARGLIST_END;
-
-            break;
-          case ']':
-            opt.data_type = Data_Prop::STRING;
-            state = DONE;
-
-            break;
-          default:
-          throw option_language_error(std::string(
-                        "expected arg type or end of arg list"));
-            break;
-        }
-
-        break;
-      case ARGLIST_END:
-        if (spec[spec_offset] == '\0') {
-        throw option_language_error(std::string(
-                      "input ended before arg list finished"));
-        }
-
-        if (spec[spec_offset] == ']') {
-          state = DONE;
-        }
-        else {
-        throw option_language_error(std::string(
-                      "expected ']' to conclude arg list"));
-        }
-
-        break;
-      case DONE:
-        if (spec[spec_offset] != '\0') {
-          throw option_language_error(std::string("input found after option spec parsed"));
-        }
-        else {
-          if (handles.empty()) {
-            throw option_language_error(std::string("no handles found in option spec"));
-          }
-
-          if (name.empty()) {
-            std::string& maybe_name = handles.back();
-            std::string::size_type ind = 0;
-            
-            if (is_name_start_char(maybe_name[0])) {
-              ind = 0;
-            }
-            else if (is_name_start_char(maybe_name[1])) {
-              ind = 1;
-            }
-            else {
-              ind = 2;
-            }
-          
-            if (maybe_name.size() == ind + 1) { // NOTE: this situation should never happen
-              throw option_language_error(std::string("handle minus prefix is the empty string"));
-            }
-            else {
-              opt.name = handles.back().substr(ind);
-            }
-          }
-          else {
-            opt.name = name;
-          }
-
-          /*
-           * if name already exists, do not insert name -> option_t
-           * and throw if existing option_t is not equal to *opt.
-           */
-          const std::set<option_t>::const_iterator
-            name_iter = name_set.find(opt);
-
-          if (name_iter == name_set.cend()) { // name not found
-            // when name is not found, this option is being registered as new
-            name_set.insert(opt);
-
-            // insert handles known with the option
-            for (const std::string handle : handles) {
-              if (handle_map.find(handle) == handle_map.cend()) {
-                handle_map.insert(std::make_pair(handle, opt));
-              }
-              else {
-                throw option_language_error(std::string("handle repeated: ") + handle);
-              }
-            }
-          }
-          else { // found the name
-            if (opt.compatible(*name_iter)) {
-              // insert handles known with the option
-              for (const std::string handle : handles) {
-                if (handle_map.find(handle) == handle_map.cend()) {
-                  handle_map.insert(std::make_pair(handle, opt));
-                }
-                else {
-                  throw option_language_error(std::string("handle repeated: ") + handle);
-                }
-              }
-            }
-            else {
-              throw option_language_error(std::string("options with same name must be compatible: ") + opt.name);
-            }
-          }
-        }
-
-        return opt;
       }
-
-      if (spec_offset < 0) {
-        spec_offset = 0;
-      }
-      else if (spec[spec_offset] != '\0'){
+      
+      if (spec[spec_offset] != '\0') {
         spec_offset++;
       }
     }
@@ -649,8 +767,7 @@ namespace util {
     opt_info info;
     std::string::size_type eq_loc;
     option_t opt;
-    std::string args;
-    const std::string default_data = "1";
+    std::string args("1");
 
     /** 
      * this is the only option_language_error thrown in the parse
@@ -666,31 +783,38 @@ namespace util {
     /* loop over all the words in argv */
     for (int i = 0; i < argc; ++i) {
       std::string handle = argv[i];
+
+      // check for End-Of-Input as either '-' or '--'
+      if ((handle.size() == 1 && handle[0] == '-')
+          || (handle.size() == 2 && handle[0] == '-' && handle[1] == '-')) {
+
+        ++i;
+
+        while (i < argc) {
+          info.rest.emplace_back(argv[i++]);
+        }
+
+        return info;
+      }
+
       eq_loc = handle.find_first_of('=');
       std::unordered_map<std::string, option_t>::const_iterator iter;
 
       // get the handle
       if (eq_loc == std::string::npos) {
         if (i == 0 && (is_bsd_opt_enabled || is_merged_opt_enabled)) {
-          bool prefix_done = false;
           bool accepted_first_special = false;
 
           char mini_handle;
 
           for (int j = 0; j < handle.size(); ++j) {
             // eliminate any prefix characters
-            while (j < 2 && !prefix_done) {
-              prefix_done = !(is_prefix_char(handle[j]));
-
-              ++j;
-
-              if (!prefix_done && !is_merged_opt_enabled) {
-                throw parse_error(std::string("bsd-style options may not use a prefix"));
-              }
-
-              if (prefix_done) {
-                j--;
-                break;
+            if (j == 0) {
+              j = skip_prefix(handle);
+              
+              if (is_bsd_opt_enabled && j > 0) {
+                throw parse_error(std::string("bsd-style options may ")
+                    + "not use a prefix");
               }
             }
 
@@ -727,7 +851,7 @@ namespace util {
                   throw parse_error(std::string("option repeated more than allowed"));
                 }
 
-                info.opt_data.insert(std::make_pair(opt.name, default_data));
+                info.opt_data.insert(std::make_pair(opt.name, args));
                 accepted_first_special = true;
               }
               else {
@@ -743,21 +867,36 @@ namespace util {
           iter = handle_map.find(handle);
         }
         else {
-          if (!is_case_sensitive){
-            // TODO use lowercase
-          }
+          if (is_case_sensitive) {
+            if (handle.size() >= 2 && handle[0] == '-' && isupper(handle[1])) {
+              iter = handle_map.find(handle.substr(0, 2));
 
-          iter = handle_map.find(handle);
+              if (iter == handle_map.cend()) {
+                iter = handle_map.find(handle);
+              }
+            }
+            else {
+              iter = handle_map.find(handle);
+            }
+          }
+          else {
+            iter = handle_map.find(strtolower(handle));
+          }
         }
       }
       else {
-        iter = handle_map.find(handle.substr(0, eq_loc));
-
         if (i == 0 && (is_subcommand_enabled
             || is_bsd_opt_enabled
             || is_merged_opt_enabled)) {
         
           throw parse_error(std::string("special options may not take arguments"));
+        }
+        
+        if (is_case_sensitive) {
+          iter = handle_map.find(handle.substr(0, eq_loc));
+        }
+        else {
+          iter = handle_map.find(strtolower(handle.substr(0, eq_loc)));
         }
       }
  
@@ -786,18 +925,18 @@ namespace util {
               + handle + "' found more than once");
         }
         else {
-          if (opt.assignment == Assign_Prop::NO_ASSIGN) {
+          switch (opt.assignment) {
+          case Assign_Prop::NO_ASSIGN:
             if (eq_loc == std::string::npos) {
-              info.opt_data.insert(std::make_pair(opt.name, default_data));
+              info.opt_data.insert(std::make_pair(opt.name, args));
             }
             else {
               throw parse_error(std::string("option with handle '")
                   + handle + "' should not have an argument");
             }
 
-            continue;
-          }
-          else if (opt.assignment == Assign_Prop::EQ_REQUIRED) {
+            break;
+          case Assign_Prop::EQ_REQUIRED:
             if (eq_loc == std::string::npos) {
               throw parse_error(std::string("option with handle '")
                   + handle + "' is missing equals sign");
@@ -805,8 +944,9 @@ namespace util {
             else {
               args = handle.substr(eq_loc+1);
             }
-          }
-          else if (opt.assignment == Assign_Prop::EQ_MAYBE) {
+
+            break;
+          case Assign_Prop::EQ_MAYBE:
             if (eq_loc == std::string::npos) {
               if (++i < argc) {
                 args = argv[i];  
@@ -819,8 +959,9 @@ namespace util {
             else {
               args = handle.substr(eq_loc+1);
             }
-          }
-          else {
+
+            break;
+          case Assign_Prop::EQ_NEVER:
             if (eq_loc == std::string::npos) {
               if (++i < argc) {
                 args = argv[i];
@@ -834,21 +975,36 @@ namespace util {
               throw parse_error(std::string("option with handle '")
                   + handle + "' should not use an equals sign");
             }
+
+            break;
+          default:
+            if (handle.size() < 3) {
+              throw parse_error(std::string("option declared with ")
+                  + "stuck assignment must have an argument");
+            }
+
+            args = handle.substr(2);
+
+            break;
+          }
+
+          if (opt.assignment == Assign_Prop::NO_ASSIGN) {
+            continue;
           }
 
           if (opt.collection == Collect_Prop::SCALAR) {
-              if (info.opt_data.find(opt.name) == info.opt_data.cend()) {
-                if (verify_arg_type(args, opt.data_type)) {
-                  info.opt_data.insert(std::make_pair(opt.name, args));
-                }
-                else {
-                  throw parse_error(std::string("data '")
-                      + args + "' does not match its declared type");
-                }
+            if (info.opt_data.find(opt.name) == info.opt_data.cend()) {
+              if (verify_arg_type(args, opt.data_type)) {
+                info.opt_data.insert(std::make_pair(opt.name, args));
               }
               else {
-                throw parse_error(std::string("handle repeated: ") + handle);
+                throw parse_error(std::string("data '")
+                    + args + "' does not match its declared type");
               }
+            }
+            else {
+              throw parse_error(std::string("handle repeated: ") + handle);
+            }
           }
           else {
             std::istringstream src(args);

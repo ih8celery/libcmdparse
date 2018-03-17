@@ -7,12 +7,12 @@
 #include <tap++.h>
 #include "options_parsing.h"
 
-constexpr int ARGC = 5;
+constexpr int ARGC = 7;
 
 using namespace TAP;
 
 int main() {
-  plan(9);
+  plan(10);
 
   util::opt_parser parser;
   util::option_t opt;
@@ -35,6 +35,8 @@ int main() {
   args[2] = (char*)"7";
   args[3] = (char*)"--friend-name=xavier";
   args[4] = (char*)"--name=george";
+  args[5] = (char*)"--";
+  args[6] = (char*)"--name";
   auto info = parser.parse(args, ARGC);
 
   ok(info.has("pi"), "option pi received");
@@ -46,6 +48,8 @@ int main() {
   ok(info.arg("friend-name") == "xavier", "my friend's name is xavier");
 
   ok(info.arg("name") == "george", "my name is george");
+
+  ok(info.rest.size() == 1, "EOI detected, remaining input moved to rest member");
 
   done_testing();
 

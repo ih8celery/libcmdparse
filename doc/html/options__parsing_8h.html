@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">liboptparse
-   &#160;<span id="projectnumber">0.3.0-1</span>
+   &#160;<span id="projectnumber">0.3.1-0</span>
    </div>
    <div id="projectbrief">command line option parsing with object-oriented interface</div>
   </td>
@@ -98,8 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p>interface to parse command line arguments/options  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;map&gt;</code><br />
-<code>#include &lt;unordered_map&gt;</code><br />
+<div class="textblock"><code>#include &lt;unordered_map&gt;</code><br />
 <code>#include &lt;set&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
@@ -137,9 +136,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:abedd41a5f5a51b3f7ce5ac4ac0c6226a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abedd41a5f5a51b3f7ce5ac4ac0c6226a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>util::opt_data_t</b> = std::multimap&lt; std::string, std::string &gt;</td></tr>
-<tr class="separator:abedd41a5f5a51b3f7ce5ac4ac0c6226a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b8a80bb188165da16a314a32017e050"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9b8a80bb188165da16a314a32017e050"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>util::opt_data_t</b> = std::unordered_multimap&lt; std::string, std::string &gt;</td></tr>
+<tr class="separator:a9b8a80bb188165da16a314a32017e050"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8be76dfd6fdbd760baa864732c8de5b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8be76dfd6fdbd760baa864732c8de5b"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>util::RangePair</b> = std::pair&lt; opt_data_t::const_iterator, opt_data_t::const_iterator &gt;</td></tr>
 <tr class="separator:ae8be76dfd6fdbd760baa864732c8de5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -162,10 +161,14 @@ Enumerations</h2></td></tr>
  }<tr class="memdesc:aaba4bef6c2cc903178730ac29d139242"><td class="mdescLeft">&#160;</td><td class="mdescRight">defines the number of times an option may appear  <a href="options__parsing_8h.html#aaba4bef6c2cc903178730ac29d139242">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:aaba4bef6c2cc903178730ac29d139242"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af696a49b6e9e294639553c16070f1855"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="options__parsing_8h.html#af696a49b6e9e294639553c16070f1855">util::Assign_Prop</a> { <b>NO_ASSIGN</b>, 
+<tr class="memitem:af696a49b6e9e294639553c16070f1855"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="options__parsing_8h.html#af696a49b6e9e294639553c16070f1855">util::Assign_Prop</a> { <br />
+&#160;&#160;<b>NO_ASSIGN</b>, 
 <b>util::Assign_Prop::EQ_REQUIRED</b>, 
 <b>util::Assign_Prop::EQ_MAYBE</b>, 
-<b>util::Assign_Prop::EQ_NEVER</b>
+<b>util::Assign_Prop::EQ_NEVER</b>, 
+<br />
+&#160;&#160;<b>util::Assign_Prop::STUCK</b>
+<br />
  }<tr class="memdesc:af696a49b6e9e294639553c16070f1855"><td class="mdescLeft">&#160;</td><td class="mdescRight">defines the mode of assignment supported by option  <a href="options__parsing_8h.html#af696a49b6e9e294639553c16070f1855">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:af696a49b6e9e294639553c16070f1855"><td class="memSeparator" colspan="2">&#160;</td></tr>
