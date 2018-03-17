@@ -40,35 +40,96 @@ struct option_t {
 }
 ```
 
-each of the members shown except for name is explained below.
+each of the members shown except for name is described below.
 
 ### Mod\_Prop
 
-describes modifiers affecting an option
+describes modifier affecting an option
+
+```c++
+enum class Mod_Prop {
+  NONE,
+  SUB,
+  BEFORE,
+  AFTER,
+  NOT_WITH
+}
+```
 
 ### Num\_Prop
 
 specifies the number of times an option may appear in command line arguments
+
+```c++
+enum class Num_Prop {
+  ZERO_ONE,
+  ZERO_MANY
+}
+```
 
 ### Assign\_Prop
 
 determines whether an option may take arguments and how its arguments
 are arranged with respect to it's handles
 
+```c++
+enum class Assign_Prop {
+  NO_ASSIGN,
+  EQ_REQUIRED,
+  EQ_MAYBE,
+  EQ_NEVER,
+  STUCK
+}
+```
+
 ### Collect\_Prop
 
 an option's collection defines the manner in which arguments are
 determined
 
+```c++
+enum class Collect_Prop {
+  SCALAR,
+  LIST
+}
+```
+
 ### Data\_Prop
 
 defines the type of data of an option's argument(s)
+
+```c++
+enum class Data_Prop {
+  STRING,
+  INTEGER,
+  FLOAT
+}
+```
 
 ## What Is an Option Spec?
 
 the option spec is the first argument to `option`, which is a condensed
 string representation of an option\_t object and the handles associated
 with the option.
+
+\<option\_spec\> := \<mod\>\<handle\_list\>\<number\>\<arg\_spec\>
+\<mod\>          := '['\<mod\_expr\>']'|\<nil\>
+\<mod\_expr\>    := \<mod\_setting\>|\<mod\_fn\>\<mod\_arg\>
+\<mod\_setting\> := '&'
+\<mod\_fn\>      := '<'|'>'|'!'
+\<mod\_arg\>     := \<option\_name\>|'*'
+\<handle\_list\> := \<handle\>|\<handle\>'|'\<handle\_list\>
+\<handle\>       := \<prefix\>\<handle\_name\>
+\<prefix\>       := '-'\<minus\>|'+'\<plus\>|'.'|':'|'/'|\<nil\>
+\<minus\>        := '-'|\<nil\>
+\<plus\>         := '+'|\<nil\>
+\<handle\_name\> := \<option\_name\>
+\<number\>       := '*'|'?'|\<nil\>
+\<arg\_spec\>    := \<eq\>\<arg\_type\>|\<eq\>\<arglist\>|\<arglist\>|\<nil\>
+\<eq\>           := '='\<eq\_type\>
+\<eq\_type\>     := '?'|'!'|'|'|\<nil\>
+\<arg\_type\>    := 's'|'i'|'f'|\<nil\>
+\<arglist\>      := '['\<arg\_type\>']'
 
 # Examples
 
