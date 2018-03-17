@@ -925,7 +925,8 @@ namespace util {
               + handle + "' found more than once");
         }
         else {
-          if (opt.assignment == Assign_Prop::NO_ASSIGN) {
+          switch (opt.assignment) {
+          case Assign_Prop::NO_ASSIGN:
             if (eq_loc == std::string::npos) {
               info.opt_data.insert(std::make_pair(opt.name, args));
             }
@@ -934,9 +935,8 @@ namespace util {
                   + handle + "' should not have an argument");
             }
 
-            continue;
-          }
-          else if (opt.assignment == Assign_Prop::EQ_REQUIRED) {
+            break;
+          case Assign_Prop::EQ_REQUIRED:
             if (eq_loc == std::string::npos) {
               throw parse_error(std::string("option with handle '")
                   + handle + "' is missing equals sign");
@@ -944,8 +944,9 @@ namespace util {
             else {
               args = handle.substr(eq_loc+1);
             }
-          }
-          else if (opt.assignment == Assign_Prop::EQ_MAYBE) {
+
+            break;
+          case Assign_Prop::EQ_MAYBE:
             if (eq_loc == std::string::npos) {
               if (++i < argc) {
                 args = argv[i];  
@@ -958,8 +959,9 @@ namespace util {
             else {
               args = handle.substr(eq_loc+1);
             }
-          }
-          else if (opt.assignment == Assign_Prop::EQ_NEVER) {
+
+            break;
+          case Assign_Prop::EQ_NEVER:
             if (eq_loc == std::string::npos) {
               if (++i < argc) {
                 args = argv[i];
@@ -973,29 +975,36 @@ namespace util {
               throw parse_error(std::string("option with handle '")
                   + handle + "' should not use an equals sign");
             }
-          }
-          else {
+
+            break;
+          default:
             if (handle.size() < 3) {
               throw parse_error(std::string("option declared with ")
                   + "stuck assignment must have an argument");
             }
 
             args = handle.substr(2);
+
+            break;
+          }
+
+          if (opt.assignment == Assign_Prop::NO_ASSIGN) {
+            continue;
           }
 
           if (opt.collection == Collect_Prop::SCALAR) {
-              if (info.opt_data.find(opt.name) == info.opt_data.cend()) {
-                if (verify_arg_type(args, opt.data_type)) {
-                  info.opt_data.insert(std::make_pair(opt.name, args));
-                }
-                else {
-                  throw parse_error(std::string("data '")
-                      + args + "' does not match its declared type");
-                }
+            if (info.opt_data.find(opt.name) == info.opt_data.cend()) {
+              if (verify_arg_type(args, opt.data_type)) {
+                info.opt_data.insert(std::make_pair(opt.name, args));
               }
               else {
-                throw parse_error(std::string("handle repeated: ") + handle);
+                throw parse_error(std::string("data '")
+                    + args + "' does not match its declared type");
               }
+            }
+            else {
+              throw parse_error(std::string("handle repeated: ") + handle);
+            }
           }
           else {
             std::istringstream src(args);
