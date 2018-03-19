@@ -131,6 +131,10 @@ namespace util {
     bool verify_arg_type(const std::string& arg, Data_Prop prop) {
       DT_STATE state = DT_STATE::START;
 
+      if (arg.empty()) {
+        return false;
+      }
+
       switch (prop) {
       case Data_Prop::STRING:
         break;
