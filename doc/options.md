@@ -4,7 +4,7 @@ option\_t objects and their associated internal state are created by
 invoking the `option` member function of the opt\_parser class, with
 the following prototype:
 
-`option_t option(const string& spec, const string name& = "")`
+`option_t option(const string& spec, const string& name = "")`
 
 # Structure of Information Stored About Options
 
@@ -112,24 +112,26 @@ the option spec is the first argument to `option`, which is a condensed
 string representation of an option\_t object and the handles associated
 with the option.
 
-\<option\_spec\> := \<mod\>\<handle\_list\>\<number\>\<arg\_spec\>
-\<mod\>          := '['\<mod\_expr\>']'|\<nil\>
-\<mod\_expr\>    := \<mod\_setting\>|\<mod\_fn\>\<mod\_arg\>
-\<mod\_setting\> := '&'
-\<mod\_fn\>      := '<'|'>'|'!'
-\<mod\_arg\>     := \<option\_name\>|'*'
-\<handle\_list\> := \<handle\>|\<handle\>'|'\<handle\_list\>
-\<handle\>       := \<prefix\>\<handle\_name\>
-\<prefix\>       := '-'\<minus\>|'+'\<plus\>|'.'|':'|'/'|\<nil\>
-\<minus\>        := '-'|\<nil\>
-\<plus\>         := '+'|\<nil\>
-\<handle\_name\> := \<option\_name\>
-\<number\>       := '*'|'?'|\<nil\>
-\<arg\_spec\>    := \<eq\>\<arg\_type\>|\<eq\>\<arglist\>|\<arglist\>|\<nil\>
-\<eq\>           := '='\<eq\_type\>
-\<eq\_type\>     := '?'|'!'|'|'|\<nil\>
-\<arg\_type\>    := 's'|'i'|'f'|\<nil\>
-\<arglist\>      := '['\<arg\_type\>']'
+```
+<option_spec> := <mod><handle_list><number><arg_spec>
+<mod>         := '['<mod_expr>']'|<nil>
+<mod_expr>    := <mod_setting>|<mod_fn><mod_arg>
+<mod_setting> := '&'
+<mod_fn>      := '<'|'>'|'!'
+<mod_arg>     := <option_name>|'*'
+<handle_list> := <handle>|<handle>'|'<handle_list>
+<handle>      := <prefix><handle_name>
+<prefix>      := '-'<minus>|'+'<plus>|'.'|':'|'/'|<nil>
+<minus>       := '-'|<nil>
+<plus>        := '+'|<nil>
+<handle_name> := <option_name>
+<number>      := '*'|'?'|<nil>
+<arg_spec>    := <eq><arg_type>|<eq><arglist>|<arglist>|<nil>
+<eq>          := '='<eq_type>
+<eq_type>     := '?'|'!'|'|'|<nil>
+<arg_type>    := 's'|'i'|'f'|<nil>
+<arglist>     := '['<arg_type>']'
+```
 
 # Examples
 
@@ -214,7 +216,7 @@ an option that splits arguments on the comma may be specified as
 this option takes string arguments which are stuck to the handle,
 like so
 
-"-Wsome,any,none",
+"-Wsome,any,none"
 
 which receives the single argument "some,any,none" and splits it into
 "some", "any", and "none".
