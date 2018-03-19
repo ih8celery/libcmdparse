@@ -15,7 +15,7 @@ constexpr int ARGC = 8;
 using namespace TAP;
 
 int main () {
-  plan(13);
+  plan(14);
 
   util::opt_parser parser;
   util::option_t opt;
@@ -42,6 +42,8 @@ int main () {
   TRY_NOT_OK(parser.option("-!!"), "handles must contain 'word' characters");
   note("handles may begin with digits, letters, or underscores.");
   note("after the beginning, handles may also contain hyphens");
+
+  TRY_NOT_OK(parser.option("---a"), "after prefix, handle must begin with [a-zA-Z0-9_]");
 
   // option may have multiple handles attached to it at once
   opt = parser.option("--is-opt|--is-option|-NAME");

@@ -13,13 +13,15 @@ using namespace util;
 
 int main() {
   opt_parser p;
+  opt_info info;
+  option_t opt;
 
   p.set(config_constants::merged_opt);
 
   p.option("d|-due?", "due");
   p.option("a", "awe");
   p.option("--afd", "AFD");
-  auto opt = p.option("f*", "file");
+  opt = p.option("f*", "file");
 
   plan(6);
 
@@ -32,7 +34,7 @@ int main() {
   argv[4] = (char *)"--afd";
   argv[5] = (char *)"--afd";
 
-  opt_info info = p.parse(argv, 2);
+  info = p.parse(argv, 2);
 
   ok(info.has("file"), "found file argument");
   ok(info.count("file") == 2, "file argument twice");

@@ -38,7 +38,7 @@ int main() {
   ok(info.has("Edit"), "subcommand found");
 
   argv++;
-  TRY_NOT_OK(p.parse(argv, 2), "cannot use subcommand after index 0");
+  TRY_NOT_OK(p.parse(argv, 2), "cannot use subcommand after first command line argument");
   argv--;
 
   delete [] argv;
