@@ -1,7 +1,7 @@
 /**
  * \file 80-subcommands.cpp
  * \author Adam Marshall
- * \brief test the use of subcommands in liboptparse
+ * \brief test the use of subcommands in libcmdparse
  */
 
 #define WANT_TEST_EXTRAS

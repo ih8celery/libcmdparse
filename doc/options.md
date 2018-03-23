@@ -172,7 +172,7 @@ this call adds a third handle "-c" to the same option, using the name
 
 ## Multiple Types of Prefixes
 
-liboptparse supports several types of handle prefixes, including the
+libcmdparse supports several types of handle prefixes, including the
 common "-", "--", and "+". you can define an option with handles
 using every type of prefix or no prefix at all.
 

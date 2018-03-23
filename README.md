@@ -1,13 +1,13 @@
-liboptparse version 0.3.2-0
+libcmdparse version 0.3.2-0
 
-# What is liboptparse?
-  liboptparse is a simple library for command line argument parsing.
+# What is libcmdparse?
+  libcmdparse is a simple library for command line argument parsing.
 options may be declared in a domain specific language resembling
 regular expressions.
 
-# Why does liboptparse exist?
+# Why does libcmdparse exist?
   this project may seem to imitate existing tools. that
-impression would be correct. the purpose of liboptparse is to
+impression would be correct. the purpose of libcmdparse is to
 experiment with C++ while doing something which is (suprisingly)
 useful in that same language: command-line argument processing.
 this project is done solely for my educational benefit, as I am new to
@@ -114,7 +114,7 @@ this scenario.
     contains the non-option strings from the parsing source
 
 ## Dependencies
-  liboptparse depends only on the standard library of C++11
+  libcmdparse depends only on the standard library of C++11
 
   building it requires CMake >= 3.0, Make, and a C++ compiler
 that supports C++11.
@@ -145,7 +145,7 @@ in that case, for better test output I recommend that you invoke ctest
 with the `--verbose` option.
 
 ## Windows
-liboptparse doesn't support Windows
+libcmdparse doesn't support Windows
 
 # License
 
