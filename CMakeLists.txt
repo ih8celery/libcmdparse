@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.0)
 
-project (Optparse LANGUAGES CXX)
+project (Cmdparse LANGUAGES CXX)
 
 set (CMAKE_CXX_STANDARD 11)
 set (HOME ${CMAKE_CURRENT_LIST_DIR})
@@ -17,5 +17,5 @@ add_subdirectory (t)
 
 add_custom_target (tags COMMAND ctags "." WORKING_DIRECTORY ${HOME})
 
-install (FILES "${PROJECT_HEADERS}/options_parsing.h"
+install (FILES "${PROJECT_HEADERS}/cmdparse.h"
          DESTINATION include)
