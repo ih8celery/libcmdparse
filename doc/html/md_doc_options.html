@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>liboptparse: Creating Options</title>
+<title>libcmdparse: Creating Options</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">liboptparse
+   <div id="projectname">libcmdparse
    &#160;<span id="projectnumber">0.3.2-0</span>
    </div>
    <div id="projectbrief">command line option parsing with object-oriented interface</div>
@@ -81,15 +81,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Creating Options </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>option_t objects and their associated internal state are created by invoking the <code>option</code> member function of the opt_parser class, with the following prototype:</p>
-<p><code>option_t option(const string&amp; spec, const string name&amp; = "")</code></p>
+<div class="textblock"><p>option_t objects and their associated internal state are created by invoking the <code>option</code> member function of the <a class="el" href="classopt__parser.html" title="class controlling option declaration and parsing ">opt_parser</a> class, with the following prototype:</p>
+<p><code>option_t option(const string&amp; spec, const string&amp; name = "")</code></p>
 <h1>Structure of Information Stored About Options</h1>
 <h2>Handles</h2>
 <p>a handle is a way of referring to options both internally and in ARGV. handles are provided when the option is defined. commonly, handles begin with "-" or "--". in the option spec, handles may be listed by separating them with "|".</p>
 <h2>Names</h2>
 <p>an option's name is its unique identifier. all definitions of options with the same name must be compatible with each other. you can refer to options by their name when defining them, as the second argument to <code>option</code>, or in the public member functions of an opt_info object.</p>
 <h2>The option_t struct</h2>
-<p>option_t is a struct without private members that is used by opt_parser to store the information provided by <code>option</code>.</p>
+<p>option_t is a struct without private members that is used by <a class="el" href="classopt__parser.html" title="class controlling option declaration and parsing ">opt_parser</a> to store the information provided by <code>option</code>.</p>
 <p>a simplified definition of the struct would look like this:</p>
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;{c++}</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;struct option_t {</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;  string name;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;  Mod_Prop mod;</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;  Num_Prop number;</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;  Assign_Prop assignment;</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;  Collect_Prop collection;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;  Data_Prop data_type;</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;}</div></div><!-- fragment --><p>each of the members shown except for name is described below.</p>
 <h3>Mod_Prop</h3>
@@ -104,9 +104,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>defines the type of data of an option's argument(s)</p>
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;{c++}</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;enum class Data_Prop {</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;  STRING,</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;  INTEGER,</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;  FLOAT</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;}</div></div><!-- fragment --><h2>What Is an Option Spec?</h2>
 <p>the option spec is the first argument to <code>option</code>, which is a condensed string representation of an option_t object and the handles associated with the option.</p>
-<p>&lt;option_spec&gt; := &lt;mod&gt;&lt;handle_list&gt;&lt;number&gt;&lt;arg_spec&gt; &lt;mod&gt; := '['&lt;mod_expr&gt;']'|&lt;nil&gt; &lt;mod_expr&gt; := &lt;mod_setting&gt;|&lt;mod_fn&gt;&lt;mod_arg&gt; &lt;mod_setting&gt; := '&amp;' &lt;mod_fn&gt; := '&lt;'|'&gt;'|'!' &lt;mod_arg&gt; := &lt;option_name&gt;|'*' &lt;handle_list&gt; := &lt;handle&gt;|&lt;handle&gt;'|'&lt;handle_list&gt; &lt;handle&gt; := &lt;prefix&gt;&lt;handle_name&gt; &lt;prefix&gt; := '-'&lt;minus&gt;|'+'&lt;plus&gt;|'.'|':'|'/'|&lt;nil&gt; &lt;minus&gt; := '-'|&lt;nil&gt; &lt;plus&gt; := '+'|&lt;nil&gt; &lt;handle_name&gt; := &lt;option_name&gt; &lt;number&gt; := '*'|'?'|&lt;nil&gt; &lt;arg_spec&gt; := &lt;eq&gt;&lt;arg_type&gt;|&lt;eq&gt;&lt;arglist&gt;|&lt;arglist&gt;|&lt;nil&gt; &lt;eq&gt; := '='&lt;eq_type&gt; &lt;eq_type&gt; := '?'|'!'|'|'|&lt;nil&gt; &lt;arg_type&gt; := 's'|'i'|'f'|&lt;nil&gt; &lt;arglist&gt; := '['&lt;arg_type&gt;']'</p>
-<h1>Examples</h1>
-<p>the following example calls to <code>option</code> demonstrate how to create common types of options. in the examples, assume <code>p</code> is an object of type <code>opt_parser</code>.</p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;&lt;option_spec&gt; := &lt;mod&gt;&lt;handle_list&gt;&lt;number&gt;&lt;arg_spec&gt;</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;&lt;mod&gt;         := &#39;[&#39;&lt;mod_expr&gt;&#39;]&#39;|&lt;nil&gt;</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;&lt;mod_expr&gt;    := &lt;mod_setting&gt;|&lt;mod_fn&gt;&lt;mod_arg&gt;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;&lt;mod_setting&gt; := &#39;&amp;&#39;</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;&lt;mod_fn&gt;      := &#39;&lt;&#39;|&#39;&gt;&#39;|&#39;!&#39;</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;&lt;mod_arg&gt;     := &lt;option_name&gt;|&#39;*&#39;</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;&lt;handle_list&gt; := &lt;handle&gt;|&lt;handle&gt;&#39;|&#39;&lt;handle_list&gt;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;&lt;handle&gt;      := &lt;prefix&gt;&lt;handle_name&gt;</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;&lt;prefix&gt;      := &#39;-&#39;&lt;minus&gt;|&#39;+&#39;&lt;plus&gt;|&#39;.&#39;|&#39;:&#39;|&#39;/&#39;|&lt;nil&gt;</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;&lt;minus&gt;       := &#39;-&#39;|&lt;nil&gt;</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;&lt;plus&gt;        := &#39;+&#39;|&lt;nil&gt;</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;&lt;handle_name&gt; := &lt;option_name&gt;</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;&lt;number&gt;      := &#39;*&#39;|&#39;?&#39;|&lt;nil&gt;</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;&lt;arg_spec&gt;    := &lt;eq&gt;&lt;arg_type&gt;|&lt;eq&gt;&lt;arglist&gt;|&lt;arglist&gt;|&lt;nil&gt;</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;&lt;eq&gt;          := &#39;=&#39;&lt;eq_type&gt;</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;&lt;eq_type&gt;     := &#39;?&#39;|&#39;!&#39;|&#39;|&#39;|&lt;nil&gt;</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;&lt;arg_type&gt;    := &#39;s&#39;|&#39;i&#39;|&#39;f&#39;|&lt;nil&gt;</div><div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;&lt;arglist&gt;     := &#39;[&#39;&lt;arg_type&gt;&#39;]&#39;</div></div><!-- fragment --><h1>Examples</h1>
+<p>the following example calls to <code>option</code> demonstrate how to create common types of options. in the examples, assume <code>p</code> is an object of type <code><a class="el" href="classopt__parser.html" title="class controlling option declaration and parsing ">opt_parser</a></code>.</p>
 <h2>Set the Option Name Explicitly or Implicitly</h2>
 <p>an option's name can be set with the second argument to <code>option</code> (if it is not the empty string). otherwise it is deduced from the last handle in the handle list, minus the prefix.</p>
 <p><code>p.option("--handle", "name")</code></p>
@@ -120,7 +119,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p><code>p.option("-c", "name")</code></p>
 <p>this call adds a third handle "-c" to the same option, using the name "name" to connect them.</p>
 <h2>Multiple Types of Prefixes</h2>
-<p>liboptparse supports several types of handle prefixes, including the common "-", "--", and "+". you can define an option with handles using every type of prefix or no prefix at all.</p>
+<p>libcmdparse supports several types of handle prefixes, including the common "-", "--", and "+". you can define an option with handles using every type of prefix or no prefix at all.</p>
 <p><code>p.option("-h|--h|.h|:h|+h|++h|/h|h")</code></p>
 <p>this example creates an option with handles using every prefix and also no prefix.</p>
 <h2>Simple Flags</h2>
@@ -140,7 +139,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>an option that splits arguments on the comma may be specified as</p>
 <p><code>p.option("-W=|[s]")</code></p>
 <p>this option takes string arguments which are stuck to the handle, like so</p>
-<p>"-Wsome,any,none",</p>
+<p>"-Wsome,any,none"</p>
 <p>which receives the single argument "some,any,none" and splits it into "some", "any", and "none". </p>
 </div></div><!-- contents -->
 <!-- start footer part -->

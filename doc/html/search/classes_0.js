@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['bsd_5fopt_5ft',['bsd_opt_t',['../structutil_1_1config__constants_1_1bsd__opt__t.html',1,'util::config_constants']]]
+  ['command',['Command',['../classcli_1_1_command.html',1,'cli']]],
+  ['command_5ferror',['command_error',['../classcli_1_1command__error.html',1,'cli']]]
 ];

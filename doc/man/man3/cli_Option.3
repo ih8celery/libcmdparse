@@ -1,0 +1,55 @@
+.TH "cli::Option" 3 "Thu May 10 2018" "Version 0.3.2-0" "libcmdparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+cli::Option \- collect the properties and identity of option  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <cmdparse\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBOption\fP ()"
+.br
+.RI "\fIdefault construct \fBOption\fP \fP"
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBProperty::Number\fP \fBnumber\fP"
+.br
+.ti -1c
+.RI "\fBProperty::Assignment\fP \fBassignment\fP"
+.br
+.ti -1c
+.RI "\fBProperty::Collection\fP \fBcollection\fP"
+.br
+.ti -1c
+.RI "\fBProperty::Arg_Type\fP \fBtype\fP"
+.br
+.ti -1c
+.RI "std::string \fBname\fP"
+.br
+.in -1c
+.SS "Friends"
+
+.in +1c
+.ti -1c
+.RI "bool \fBoperator<\fP (const \fBOption\fP &, const \fBOption\fP &) noexcept"
+.br
+.ti -1c
+.RI "bool \fBoperator==\fP (const \fBOption\fP &, const \fBOption\fP &) noexcept"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+collect the properties and identity of option 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libcmdparse from the source code\&.

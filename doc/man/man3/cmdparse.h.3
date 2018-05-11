@@ -1,0 +1,132 @@
+.TH "lib/include/cmdparse.h" 3 "Thu May 10 2018" "Version 0.3.2-0" "libcmdparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lib/include/cmdparse.h \- interface to parse command line arguments/options  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <unordered_map>\fP
+.br
+\fC#include <set>\fP
+.br
+\fC#include <string>\fP
+.br
+\fC#include <vector>\fP
+.br
+\fC#include <exception>\fP
+.br
+\fC#include <memory>\fP
+.br
+\fC#include <tuple>\fP
+.br
+
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBcli::Info\fP"
+.br
+.RI "\fIrepresent data collected during parsing \fP"
+.ti -1c
+.RI "struct \fBcli::Option\fP"
+.br
+.RI "\fIcollect the properties and identity of option \fP"
+.ti -1c
+.RI "class \fBcli::Command\fP"
+.br
+.ti -1c
+.RI "class \fBcli::parse_error\fP"
+.br
+.RI "\fIthrown during parsing \fP"
+.ti -1c
+.RI "class \fBcli::option_language_error\fP"
+.br
+.RI "\fIthrown when options declared \fP"
+.ti -1c
+.RI "class \fBcli::command_error\fP"
+.br
+.RI "\fIthrown during command parsing \fP"
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBcli::Property::Number\fP { \fBZERO_ONE\fP, \fBZERO_MANY\fP }
+.RI "\fIdefines the number of times an option may appear \fP""
+.br
+.ti -1c
+.RI "enum \fBcli::Property::Assignment\fP { \fBNO_ASSIGN\fP, \fBEQ_REQUIRED\fP, \fBEQ_MAYBE\fP, \fBEQ_NEVER\fP, \fBSTUCK\fP }
+.RI "\fIdefines the mode of assignment supported by option \fP""
+.br
+.ti -1c
+.RI "enum \fBcli::Property::Collection\fP { \fBSCALAR\fP, \fBLIST\fP }
+.RI "\fIdefines how arguments are interpreted \fP""
+.br
+.ti -1c
+.RI "enum \fBcli::Property::Arg_Type\fP { \fBSTRING\fP, \fBINTEGER\fP, \fBFLOAT\fP }
+.RI "\fIdefines the type of data of an option's argument \fP""
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+interface to parse command line arguments/options 
+
+
+.PP
+\fBAuthor:\fP
+.RS 4
+Adam Marshall (ih8celery) 
+.RE
+.PP
+
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBcli::Property::Arg_Type\fP\fC [strong]\fP"
+
+.PP
+defines the type of data of an option's argument <data_type> := <nil> // Arg_Type::STRING 
+.br
+ | 's' // Arg_Type::STRING 
+.br
+ | 'i' // Arg_Type::INTEGER 
+.br
+ | 'f' // Arg_Type::FLOAT 
+.br
+ 
+.SS "enum \fBcli::Property::Assignment\fP\fC [strong]\fP"
+
+.PP
+defines the mode of assignment supported by option <assignment> := <nil> // Assignment::NONE 
+.br
+ | '=' // Assignment::EQ_REQUIRED 
+.br
+ | '=?' // Assignment::EQ_MAYBE 
+.br
+ | '=!' // Assignment::EQ_NEVER 
+.br
+ | '=|' // Assignment::STUCK_ARG 
+.br
+ 
+.SS "enum \fBcli::Property::Collection\fP\fC [strong]\fP"
+
+.PP
+defines how arguments are interpreted <collection> := <nil> // Collection::SCALAR 
+.br
+ | '['<data_prop>']' // Collection::LIST 
+.br
+ 
+.SS "enum \fBcli::Property::Number\fP\fC [strong]\fP"
+
+.PP
+defines the number of times an option may appear <number> := <nil> // Number::ZERO_ONE 
+.br
+ | '?' // Number::ZERO_ONE 
+.br
+ | '*' // Number::ZERO_MANY 
+.br
+ 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libcmdparse from the source code\&.

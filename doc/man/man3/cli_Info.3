@@ -1,0 +1,57 @@
+.TH "cli::Info" 3 "Thu May 10 2018" "Version 0.3.2-0" "libcmdparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+cli::Info \- represent data collected during parsing  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <cmdparse\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "bool \fBhas\fP (const std::string &) const "
+.br
+.RI "\fItest whether a particular option was found in parsing \fP"
+.ti -1c
+.RI "bool \fBhas_command\fP (const std::string &) const "
+.br
+.RI "\fItest whether a command was found in argv \fP"
+.ti -1c
+.RI "std::pair< bool, std::string > \fBget\fP (const std::string &) const "
+.br
+.RI "\fIretrieve value of option \fP"
+.ti -1c
+.RI "std::tuple< bool, opt_data_t::const_iterator, opt_data_t::const_iterator > \fBget_all\fP (const std::string &) const "
+.br
+.RI "\fIretrieve the range of iterators with parameter as key \fP"
+.ti -1c
+.RI "opt_data_t::size_type \fBcount\fP (const std::string &) const "
+.br
+.RI "\fIcount occurrences of option during parsing \fP"
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "std::vector< std::string > \fBrest\fP"
+.br
+.RI "\fIcontains non-options found during parsing \fP"
+.in -1c
+.SS "Friends"
+
+.in +1c
+.ti -1c
+.RI "class \fBCommand\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+represent data collected during parsing 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libcmdparse from the source code\&.

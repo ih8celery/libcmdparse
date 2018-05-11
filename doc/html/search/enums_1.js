@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['collect_5fprop',['Collect_Prop',['../options__parsing_8h.html#ac85864dda10be55f455bb8388ef3bc5c',1,'util']]]
+  ['collection',['Collection',['../cmdparse_8h.html#a1c5150c0e9bb05b86fa7fb479bc6f895',1,'cli::Property']]]
 ];

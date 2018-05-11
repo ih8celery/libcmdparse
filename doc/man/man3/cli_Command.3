@@ -1,0 +1,73 @@
+.TH "cli::Command" 3 "Thu May 10 2018" "Version 0.3.2-0" "libcmdparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+cli::Command \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBCommand\fP ()"
+.br
+.RI "\fIcreate a \fBCommand\fP object using the empty string as name \fP"
+.ti -1c
+.RI "\fBCommand\fP (const std::string &)"
+.br
+.ti -1c
+.RI "std::shared_ptr< \fBOption\fP > \fBoption\fP (const char *, const std::string &='')"
+.br
+.RI "\fIdeclare an option to the parser \fP"
+.ti -1c
+.RI "std::shared_ptr< \fBCommand\fP > \fBcommand\fP (const std::string &)"
+.br
+.RI "\fIdeclare a command owned by this object \fP"
+.ti -1c
+.RI "\fBInfo\fP \fBparse\fP (char **, int, \fBInfo\fP *=nullptr) const "
+.br
+.RI "\fIextract options from argv into an opt_info object \fP"
+.ti -1c
+.RI "bool \fBempty\fP () const noexcept"
+.br
+.RI "\fItests whether the parser has any registered options \fP"
+.ti -1c
+.RI "void \fBclear\fP ()"
+.br
+.RI "\fIclear the data collected from calls to \fBoption()\fP \fP"
+.ti -1c
+.RI "void \fBconfigure\fP (const std::string &)"
+.br
+.RI "\fItoggle boolean private members of \fBCommand\fP class \fP"
+.ti -1c
+.RI "bool \fBhandle_has_name\fP (const std::string &, const std::string &) const "
+.br
+.RI "\fItest whether option attached to handle has a certain name \fP"
+.in -1c
+.SH "Member Function Documentation"
+.PP 
+.SS "shared_ptr< \fBOption\fP > cli::Command::option (const char * spec, const std::string & name = \fC''\fP)"
+
+.PP
+declare an option to the parser option name is the second argument to the function 
+.br
+ see doc/option/spec\&.md for full description of options\&. 
+.br
+ throws an \fBoption_language_error\fP if something goes wrong 
+.br
+ 
+.SS "opt_info cli::Command::parse (char ** argv, int argc, \fBInfo\fP * d = \fCnullptr\fP) const"
+
+.PP
+extract options from argv into an opt_info object any options or data belonging to options is removed from 
+.br
+ argv and replaced with nullptr\&. 
+.br
+ throws a \fBparse_error\fP if something goes wrong 
+.br
+ 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libcmdparse from the source code\&.

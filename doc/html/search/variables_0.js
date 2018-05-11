@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rest',['rest',['../classutil_1_1opt__info.html#a49006ca159d0fddada1e1dfe8722a74c',1,'util::opt_info']]]
+  ['rest',['rest',['../classcli_1_1_info.html#a70b44e360bd878c6949d28f12bdb9532',1,'cli::Info']]]
 ];

@@ -1,0 +1,50 @@
+.TH "lib/src/cmdparse.cpp" 3 "Thu May 10 2018" "Version 0.3.2-0" "libcmdparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lib/src/cmdparse.cpp \- parse command line arguments/options  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'cmdparse\&.h'\fP
+.br
+\fC#include <sstream>\fP
+.br
+\fC#include <cctype>\fP
+.br
+\fC#include <iostream>\fP
+.br
+
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBDT_STATE\fP { \fBSTART\fP, \fBLDIGIT\fP, \fBRDIGIT\fP, \fBDOT\fP, \fBEND\fP }"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "bool \fBcli::operator<\fP (const Option &l, const Option &r) noexcept"
+.br
+.ti -1c
+.RI "bool \fBcli::operator==\fP (const Option &l, const Option &r) noexcept"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+parse command line arguments/options 
+
+
+.PP
+\fBAuthor:\fP
+.RS 4
+Adam Marshall (ih8celery) 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libcmdparse from the source code\&.

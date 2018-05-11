@@ -1,0 +1,219 @@
+.TH "md_doc_options" 3 "Thu May 10 2018" "Version 0.3.2-0" "libcmdparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+md_doc_options \- Creating Options 
+option_t objects and their associated internal state are created by invoking the \fCoption\fP member function of the \fBopt_parser\fP class, with the following prototype:
+.PP
+\fCoption_t option(const string& spec, const string& name = '')\fP
+.PP
+.SH "Structure of Information Stored About Options"
+.PP
+.PP
+.SS "Handles"
+.PP
+a handle is a way of referring to options both internally and in ARGV\&. handles are provided when the option is defined\&. commonly, handles begin with '-' or '--'\&. in the option spec, handles may be listed by separating them with '|'\&.
+.PP
+.SS "Names"
+.PP
+an option's name is its unique identifier\&. all definitions of options with the same name must be compatible with each other\&. you can refer to options by their name when defining them, as the second argument to \fCoption\fP, or in the public member functions of an opt_info object\&.
+.PP
+.SS "The option_t struct"
+.PP
+option_t is a struct without private members that is used by \fBopt_parser\fP to store the information provided by \fCoption\fP\&.
+.PP
+a simplified definition of the struct would look like this:
+.PP
+.PP
+.nf
+1 {c++}
+2 struct option_t {
+3   string name;
+4   Mod_Prop mod;
+5   Num_Prop number;
+6   Assign_Prop assignment;
+7   Collect_Prop collection;
+8   Data_Prop data_type;
+9 }
+.fi
+.PP
+.PP
+each of the members shown except for name is described below\&.
+.PP
+.SS "Mod_Prop"
+.PP
+describes modifier affecting an option
+.PP
+.PP
+.nf
+1 {c++}
+2 enum class Mod_Prop {
+3   NONE,
+4   SUB,
+5   BEFORE,
+6   AFTER,
+7   NOT_WITH
+8 }
+.fi
+.PP
+.PP
+.SS "Num_Prop"
+.PP
+specifies the number of times an option may appear in command line arguments
+.PP
+.PP
+.nf
+1 {c++}
+2 enum class Num_Prop {
+3   ZERO_ONE,
+4   ZERO_MANY
+5 }
+.fi
+.PP
+.PP
+.SS "Assign_Prop"
+.PP
+determines whether an option may take arguments and how its arguments are arranged with respect to it's handles
+.PP
+.PP
+.nf
+1 {c++}
+2 enum class Assign_Prop {
+3   NO_ASSIGN,
+4   EQ_REQUIRED,
+5   EQ_MAYBE,
+6   EQ_NEVER,
+7   STUCK
+8 }
+.fi
+.PP
+.PP
+.SS "Collect_Prop"
+.PP
+an option's collection defines the manner in which arguments are determined
+.PP
+.PP
+.nf
+1 {c++}
+2 enum class Collect_Prop {
+3   SCALAR,
+4   LIST
+5 }
+.fi
+.PP
+.PP
+.SS "Data_Prop"
+.PP
+defines the type of data of an option's argument(s)
+.PP
+.PP
+.nf
+1 {c++}
+2 enum class Data_Prop {
+3   STRING,
+4   INTEGER,
+5   FLOAT
+6 }
+.fi
+.PP
+.PP
+.SS "What Is an Option Spec?"
+.PP
+the option spec is the first argument to \fCoption\fP, which is a condensed string representation of an option_t object and the handles associated with the option\&.
+.PP
+.PP
+.nf
+1 <option_spec> := <mod><handle_list><number><arg_spec>
+2 <mod>         := '['<mod_expr>']'|<nil>
+3 <mod_expr>    := <mod_setting>|<mod_fn><mod_arg>
+4 <mod_setting> := '&'
+5 <mod_fn>      := '<'|'>'|'!'
+6 <mod_arg>     := <option_name>|'*'
+7 <handle_list> := <handle>|<handle>'|'<handle_list>
+8 <handle>      := <prefix><handle_name>
+9 <prefix>      := '-'<minus>|'+'<plus>|'\&.'|':'|'/'|<nil>
+10 <minus>       := '-'|<nil>
+11 <plus>        := '+'|<nil>
+12 <handle_name> := <option_name>
+13 <number>      := '*'|'?'|<nil>
+14 <arg_spec>    := <eq><arg_type>|<eq><arglist>|<arglist>|<nil>
+15 <eq>          := '='<eq_type>
+16 <eq_type>     := '?'|'!'|'|'|<nil>
+17 <arg_type>    := 's'|'i'|'f'|<nil>
+18 <arglist>     := '['<arg_type>']'
+.fi
+.PP
+.PP
+.SH "Examples"
+.PP
+.PP
+the following example calls to \fCoption\fP demonstrate how to create common types of options\&. in the examples, assume \fCp\fP is an object of type \fC\fBopt_parser\fP\fP\&.
+.PP
+.SS "Set the Option Name Explicitly or Implicitly"
+.PP
+an option's name can be set with the second argument to \fCoption\fP (if it is not the empty string)\&. otherwise it is deduced from the last handle in the handle list, minus the prefix\&.
+.PP
+\fCp\&.option('--handle', 'name')\fP
+.PP
+the above option has the name 'name'\&.
+.PP
+\fCp\&.option('--handle')\fP
+.PP
+here the name is deduced to be 'handle'\&.
+.PP
+.SS "Multiple Handles to an Option"
+.PP
+you can define multiple handles which target the same option\&. this can be achieved in a single option spec or across multiple specs\&. note that in the latter case, the options deduced from the separate specs must be compatible\&.
+.PP
+\fCp\&.option('-a|-b', 'name')\fP
+.PP
+this call creates an option with name 'name' and the handles '-a' and '-b'\&.
+.PP
+\fCp\&.option('-c', 'name')\fP
+.PP
+this call adds a third handle '-c' to the same option, using the name 'name' to connect them\&.
+.PP
+.SS "Multiple Types of Prefixes"
+.PP
+libcmdparse supports several types of handle prefixes, including the common '-', '--', and '+'\&. you can define an option with handles using every type of prefix or no prefix at all\&.
+.PP
+\fCp\&.option('-h|--h|\&.h|:h|+h|++h|/h|h')\fP
+.PP
+this example creates an option with handles using every prefix and also no prefix\&.
+.PP
+.SS "Simple Flags"
+.PP
+\fCp\&.option('--has-option')\fP
+.PP
+this creates an option with no arguments that has the handle '--has-option'\&. implicitly, it is allowed to occur only once\&. you may state this explicitly with
+.PP
+\fCp\&.option('--has-option?')\fP
+.PP
+or allow it to occur any number of times with
+.PP
+\fCp\&.option('--has-option*')\fP
+.PP
+.SS "Options with Arguments"
+.PP
+options may take string, integer, or floating point arguments, depending on how they are declared\&. the default argument type is string\&.
+.PP
+\fCp\&.option('-age=i')\fP
+.PP
+when the handle '-age' is found in parsing, optparser will enforce three conditions:
+.IP "1." 4
+an '=' must be used to separate the handle from its argument
+.IP "2." 4
+the handle must have an argument
+.IP "3." 4
+the argument must match an integer
+.PP
+.PP
+an option that splits arguments on the comma may be specified as
+.PP
+\fCp\&.option('-W=|[s]')\fP
+.PP
+this option takes string arguments which are stuck to the handle, like so
+.PP
+'-Wsome,any,none'
+.PP
+which receives the single argument 'some,any,none' and splits it into 'some', 'any', and 'none'\&. 

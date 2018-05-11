@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>liboptparse: Class Hierarchy</title>
+<title>libcmdparse: Class Hierarchy</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">liboptparse
+   <div id="projectname">libcmdparse
    &#160;<span id="projectnumber">0.3.2-0</span>
    </div>
    <div id="projectbrief">command line option parsing with object-oriented interface</div>
@@ -93,17 +93,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p><a href="inherits.html">Go to the graphical class hierarchy</a></p>
 This inheritance list is sorted roughly, but not completely, alphabetically:</div><div class="directory">
 <div class="levels">[detail level <span onclick="javascript:toggleLevel(1);">1</span><span onclick="javascript:toggleLevel(2);">2</span>]</div><table class="directory">
-<tr id="row_0_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="structutil_1_1config__constants_1_1bsd__opt__t.html" target="_self">util::config_constants::bsd_opt_t</a></td><td class="desc"></td></tr>
-<tr id="row_1_"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="structutil_1_1config__constants_1_1case__sensitive__t.html" target="_self">util::config_constants::case_sensitive_t</a></td><td class="desc"></td></tr>
-<tr id="row_2_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="structutil_1_1config__constants_1_1error__if__unknown__t.html" target="_self">util::config_constants::error_if_unknown_t</a></td><td class="desc"></td></tr>
-<tr id="row_3_"><td class="entry"><span style="width:0px;display:inline-block;">&#160;</span><span id="arr_3_" class="arrow" onclick="toggleFolder('3_')">&#9660;</span><span class="icona"><span class="icon">C</span></span><b>exception</b></td><td class="desc"></td></tr>
-<tr id="row_3_0_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classutil_1_1option__language__error.html" target="_self">util::option_language_error</a></td><td class="desc">Thrown when options declared or, in one case, at the start of parsing </td></tr>
-<tr id="row_3_1_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classutil_1_1parse__error.html" target="_self">util::parse_error</a></td><td class="desc">Thrown during parsing </td></tr>
-<tr id="row_4_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="structutil_1_1config__constants_1_1merged__opt__t.html" target="_self">util::config_constants::merged_opt_t</a></td><td class="desc"></td></tr>
-<tr id="row_5_"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classutil_1_1opt__info.html" target="_self">util::opt_info</a></td><td class="desc">Data collected during parsing </td></tr>
-<tr id="row_6_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classutil_1_1opt__parser.html" target="_self">util::opt_parser</a></td><td class="desc">Class controlling option declaration and parsing </td></tr>
-<tr id="row_7_"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="structutil_1_1option__t.html" target="_self">util::option_t</a></td><td class="desc">Collects the properties and identity of an option </td></tr>
-<tr id="row_8_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="structutil_1_1config__constants_1_1subcommand__t.html" target="_self">util::config_constants::subcommand_t</a></td><td class="desc"></td></tr>
+<tr id="row_0_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classcli_1_1_command.html" target="_self">cli::Command</a></td><td class="desc"></td></tr>
+<tr id="row_1_"><td class="entry"><span style="width:0px;display:inline-block;">&#160;</span><span id="arr_1_" class="arrow" onclick="toggleFolder('1_')">&#9660;</span><span class="icona"><span class="icon">C</span></span><b>exception</b></td><td class="desc"></td></tr>
+<tr id="row_1_0_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classcli_1_1command__error.html" target="_self">cli::command_error</a></td><td class="desc">Thrown during command parsing </td></tr>
+<tr id="row_1_1_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classcli_1_1option__language__error.html" target="_self">cli::option_language_error</a></td><td class="desc">Thrown when options declared </td></tr>
+<tr id="row_1_2_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classcli_1_1parse__error.html" target="_self">cli::parse_error</a></td><td class="desc">Thrown during parsing </td></tr>
+<tr id="row_2_"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classcli_1_1_info.html" target="_self">cli::Info</a></td><td class="desc">Represent data collected during parsing </td></tr>
+<tr id="row_3_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classopt__parser.html" target="_self">opt_parser</a></td><td class="desc">Class controlling option declaration and parsing </td></tr>
+<tr id="row_4_"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classcli_1_1_option.html" target="_self">cli::Option</a></td><td class="desc">Collect the properties and identity of option </td></tr>
 </table>
 </div><!-- directory -->
 </div><!-- contents -->

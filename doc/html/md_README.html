@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>liboptparse: README</title>
+<title>libcmdparse: README</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">liboptparse
+   <div id="projectname">libcmdparse
    &#160;<span id="projectnumber">0.3.2-0</span>
    </div>
    <div id="projectbrief">command line option parsing with object-oriented interface</div>
@@ -81,11 +81,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">README </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>liboptparse version 0.3.2-0</p>
-<h1>What is liboptparse?</h1>
-<p>liboptparse is a simple library for command line argument parsing. options may be declared in a domain specific language resembling regular expressions.</p>
-<h1>Why does liboptparse exist?</h1>
-<p>this project may seem to imitate existing tools. that impression would be correct. the purpose of liboptparse is to experiment with C++ while doing something which is (suprisingly) useful in that same language: command-line argument processing. this project is done solely for my educational benefit, as I am new to C++, so all constructive criticism is welcomed.</p>
+<div class="textblock"><p>libcmdparse version 0.3.2-0</p>
+<h1>What is libcmdparse?</h1>
+<p>libcmdparse is a simple library for command line argument parsing. options may be declared in a domain specific language resembling regular expressions.</p>
+<h1>Why does libcmdparse exist?</h1>
+<p>this project may seem to imitate existing tools. that impression would be correct. the purpose of libcmdparse is to experiment with C++ while doing something which is (suprisingly) useful in that same language: command-line argument processing. this project is done solely for my educational benefit, as I am new to C++, so all constructive criticism is welcomed.</p>
 <h1>Details</h1>
 <h2>What is an option?</h2>
 <p>options are represented by the option_t struct, which specifies the properties of the option as well as its uniquely identifying name. option_t objects are considered equal if they have equal names. options are identified in two key ways: through the name, which is used internally while defining options to maintain consistency, and externally by the user as the single access point to the results of parsing; and through the handles which appear in unparsed input, such as "--version" or "-V". the user provides handles at the time options are defined; an option's name is either the second argument to option_parser's option member or is deduced from the list of handles. options have four properties: number, assignment, collection, and data type, which are used to express the full range of possible option implementations. a typical boolean option, for instance, might be implemented as </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;{c++}</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;  parser.option(&quot;--histexpand?&quot;)</div></div><!-- fragment --><p> here the handle is "--histexpand", and the "?" following the name indicates that the option is allowed to appear zero or one time (i.e. it has number ZERO_ONE). this number is the default setting, so the question mark could be left out without changing the meaning. since no name is provided to the option method, the name of this option is deduced to be simply "histexpand".</p>
@@ -131,14 +131,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p><code>std::vector&lt;std::string&gt; rest</code></p>
 <p>contains the non-option strings from the parsing source</p>
 <h2>Dependencies</h2>
-<p>liboptparse depends only on the standard library of C++11</p>
+<p>libcmdparse depends only on the standard library of C++11</p>
 <p>building it requires CMake &gt;= 3.0, Make, and a C++ compiler that supports C++11.</p>
 <p>all tests depend on libtap++.</p>
 <h1>Installation</h1>
 <h2>Ubuntu/Debian</h2>
 <p>Clone the project and <code>cd</code> to its directory. Run CMake on the current directory: </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cmake .</div></div><!-- fragment --><p>Then use make to build, test, and install: </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;make</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;make test</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;sudo make install</div></div><!-- fragment --><p>make's <code>debug</code> target can be used in place of <code>test</code>. it runs uses a shell script as a substitute for CTest, the test driver included with CMake, because CTest does not play well with unit test libraries. invoke ctest manually if you cannot or don't wish to run the script. in that case, for better test output I recommend that you invoke ctest with the <code>--verbose</code> option.</p>
 <h2>Windows</h2>
-<p>liboptparse doesn't support Windows</p>
+<p>libcmdparse doesn't support Windows</p>
 <h1>License</h1>
 <p>Copyright (C) 2018 Adam Marshall</p>
 <p>Made available under the MIT license, which is distributed with the project itself </p>
