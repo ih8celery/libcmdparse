@@ -1,10 +1,10 @@
 /**
  * \file 20-option-assignment.cpp
  * \author Adam Marshall (ih8celery)
- * \brief test the definition of the option_t::assignment property
+ * \brief test the definition of the Option::assignment property
  */
 
-#include "options_parsing.h"
+#include "cmdparse.h"
 #include <tap++.h>
 
 constexpr int ARGC = 7;
@@ -14,20 +14,20 @@ using namespace TAP;
 int main() {
   plan(8);
 
-  util::opt_parser parser;
-  util::option_t opt;
+  cli::Command cmd;
+  std::shared_ptr<cli::Option> opt;
 
-  opt = parser.option("-humanity=s"); // eq_required
-  ok(opt.assignment == util::Assign_Prop::EQ_REQUIRED, "equals sign is required in argument assignment");
+  opt = cmd.option("-humanity=s"); // eq_required
+  ok(opt->assignment == cli::Property::Assignment::EQ_REQUIRED, "equals sign is required in argument assignment");
   
-  opt = parser.option("-age=?i"); // eq_maybe
-  ok(opt.assignment == util::Assign_Prop::EQ_MAYBE, "equals sign is optional in argument assignment");
+  opt = cmd.option("-age=?i"); // eq_maybe
+  ok(opt->assignment == cli::Property::Assignment::EQ_MAYBE, "equals sign is optional in argument assignment");
 
-  opt = parser.option("--is-stupid"); // no_assign
-  ok(opt.assignment == util::Assign_Prop::NO_ASSIGN, "no assignment, so equals sign is not allowed");
+  opt = cmd.option("--is-stupid"); // no_assign
+  ok(opt->assignment == cli::Property::Assignment::NO_ASSIGN, "no assignment, so equals sign is not allowed");
 
-  opt = parser.option("-wife=!s"); // eq_never
-  ok(opt.assignment == util::Assign_Prop::EQ_NEVER, "equals sign not allowed in argument assignment");
+  opt = cmd.option("-wife=!s"); // eq_never
+  ok(opt->assignment == cli::Property::Assignment::EQ_NEVER, "equals sign not allowed in argument assignment");
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"data";
@@ -38,14 +38,14 @@ int main() {
   args[5] = (char*)"-humanity=yes";
   args[6] = (char *)"finally";
 
-  util::opt_info info = parser.parse(args, ARGC); 
+  cli::Info info = cmd.parse(args, ARGC); 
   ok(info.rest.size() == 3, "found three non-options");
 
-  is(info.arg("wife"), "ellen", "wife's name is ellen");
+  is(info.get("wife").second, "ellen", "wife's name is ellen");
 
-  is(info.arg("age"), "42", "age is 42");
+  is(info.get("age").second, "42", "age is 42");
 
-  is(info.arg("humanity"), "yes", "type is human");
+  is(info.get("humanity").second, "yes", "type is human");
 
   done_testing();
 

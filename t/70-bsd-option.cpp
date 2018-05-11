@@ -6,19 +6,19 @@
 
 #define WANT_TEST_EXTRAS
 #include <tap++.h>
-#include "options_parsing.h"
+#include "cmdparse.h"
 
 using namespace TAP;
-using namespace util;
+using namespace cli;
 
 int main() {
-  opt_parser p;
+  Command cmd;
 
-  p.set(config_constants::bsd_opt);
+  cmd.configure("bsd_opt");
 
-  p.option("d?", "due");
-  p.option("a|-awe", "awe");
-  p.option("f*", "file");
+  cmd.option("d?", "due");
+  cmd.option("a|-awe", "awe");
+  cmd.option("f*", "file");
 
   char ** argv = new char*[4];
 
@@ -29,7 +29,7 @@ int main() {
 
   plan(5);
 
-  opt_info info = p.parse(argv, 2);
+  Info info = cmd.parse(argv, 2);
 
   ok(info.has("file"), "found file argument");
   ok(info.count("file") == 2, "found file argument twice");
@@ -37,7 +37,7 @@ int main() {
   ok(info.count("due") == 1, "found due argument once");
 
   argv += 2;
-  TRY_NOT_OK(p.parse(argv, 2), "bsd options may not be excessively repeated");
+  TRY_NOT_OK(cmd.parse(argv, 2), "bsd options may not be excessively repeated");
   argv -= 2;
 
   delete [] argv;

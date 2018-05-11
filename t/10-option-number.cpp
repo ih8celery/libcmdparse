@@ -5,7 +5,7 @@
  */
 
 #include <tap++.h>
-#include "options_parsing.h"
+#include "cmdparse.h"
 
 using namespace TAP;
 
@@ -14,20 +14,20 @@ constexpr int ARGC = 7;
 int main () {
   plan(7);
 
-  util::opt_parser parser;
-  util::option_t opt;
+  cli::Command cmd;
+  std::shared_ptr<cli::Option> opt;
 
   // definition of option/name has default number
-  opt = parser.option("--has-opt");
-  ok(opt.number == util::Num_Prop::ZERO_ONE, "options have a default number of ZERO_ONE");
+  opt = cmd.option("--has-opt");
+  ok(opt->number == cli::Property::Number::ZERO_ONE, "options have a default number of ZERO_ONE");
 
   // explicit zero_one option
-  opt = parser.option("-single?");
-  ok(opt.number == util::Num_Prop::ZERO_ONE, "options explicitly assigned ZERO_ONE number with '?'");
+  opt = cmd.option("-single?");
+  ok(opt->number == cli::Property::Number::ZERO_ONE, "options explicitly assigned ZERO_ONE number with '?'");
 
   // explicit zero_many option
-  opt = parser.option("-verbose*");
-  ok(opt.number == util::Num_Prop::ZERO_MANY, "option explicitly assigned ZERO_MANY number with '*'");
+  opt = cmd.option("-verbose*");
+  ok(opt->number == cli::Property::Number::ZERO_MANY, "option explicitly assigned ZERO_MANY number with '*'");
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"-verbose";
@@ -38,7 +38,7 @@ int main () {
   args[5] = (char*)"-verbose";
   args[6] = (char*)"-verbose";
 
-  auto info = parser.parse(args, ARGC);
+  auto info = cmd.parse(args, ARGC);
   
   ok(info.rest.size() == 2, "two non-options found");
 

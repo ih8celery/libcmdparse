@@ -6,44 +6,33 @@
 
 #define WANT_TEST_EXTRAS
 #include <tap++.h>
-#include "options_parsing.h"
+#include "cmdparse.h"
 
 using namespace TAP;
-using namespace util;
+using namespace cli;
 
 int main() {
-  opt_parser p;
+  Command cmd;
 
-  p.set(config_constants::sub);
+  std::shared_ptr<Command> cmd1, cmd2;
 
-  plan(6);
+  cmd1 = cmd.command("remote");
+  cmd2 = cmd1->command("add");
 
-  auto opt = p.option("[&]start");
-  
-  ok(opt.name == "start", "option named 'start'");
-  ok(opt.mod  == Mod_Prop::SUB, "'start' is subcommand");
+  char ** argv = new char*[2];
+  argv[0] = (char*)("remote");
+  argv[1] = (char*)("add");
 
-  opt = p.option("[&]edit", "Edit");
+  auto info = cmd.parse(argv, 2);
 
-  ok(opt.name == "Edit", "option named 'Edit'");
-  ok(opt.mod  == Mod_Prop::SUB, "'Edit' is subcommand");
-  
-  char ** argv = new char*[3];
-  argv[0] = (char *)("edit");
-  argv[1] = (char *)("start");
-  argv[2] = (char *)("edit");
+  plan(2);
 
-  auto info = p.parse(argv, 1);
-
-  ok(info.has("Edit"), "subcommand found");
-
-  argv++;
-  TRY_NOT_OK(p.parse(argv, 2), "cannot use subcommand after first command line argument");
-  argv--;
-
-  delete [] argv;
+  ok(info.has_command("remote"), "subcommand 'remote'");
+  ok(info.has_command("add"), "subcommand 'add'");
 
   done_testing();
+
+  delete [] argv;
 
   return exit_status();
 }

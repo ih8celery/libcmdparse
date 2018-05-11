@@ -6,22 +6,22 @@
 
 #define WANT_TEST_EXTRAS
 #include <tap++.h>
-#include "options_parsing.h"
+#include "cmdparse.h"
 
 using namespace TAP;
-using namespace util;
+using namespace cli;
 
 int main() {
-  opt_parser p;
-  opt_info info;
-  option_t opt;
+  Command cmd;
+  Info info;
+  std::shared_ptr<Option> opt;
 
-  p.set(config_constants::merged_opt);
+  cmd.configure("merged_opt");
 
-  p.option("d|-due?", "due");
-  p.option("a", "awe");
-  p.option("--afd", "AFD");
-  opt = p.option("f*", "file");
+  cmd.option("d|-due?", "due");
+  cmd.option("a", "awe");
+  cmd.option("--afd", "AFD");
+  opt = cmd.option("f*", "file");
 
   plan(6);
 
@@ -34,7 +34,7 @@ int main() {
   argv[4] = (char *)"--afd";
   argv[5] = (char *)"--afd";
 
-  info = p.parse(argv, 2);
+  info = cmd.parse(argv, 2);
 
   ok(info.has("file"), "found file argument");
   ok(info.count("file") == 2, "file argument twice");
@@ -42,10 +42,10 @@ int main() {
   ok(info.count("due") == 1, "found due argument once");
 
   argv += 2;
-  TRY_NOT_OK(p.parse(argv, 2), "merged option may not be repeated excessively");
+  TRY_NOT_OK(cmd.parse(argv, 2), "merged option may not be repeated excessively");
 
   argv += 2;
-  info = p.parse(argv, 2);
+  info = cmd.parse(argv, 2);
 
   ok(info.count("AFD"), "option named AFD found once");
 
