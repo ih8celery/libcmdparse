@@ -1,6 +1,5 @@
 set (LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_LIST_DIR})
-set (CMAKE_CXX_FLAGS "-fpermissive")
 
-add_library (optparse SHARED options_parsing.cpp)
+add_library (cmdparse SHARED cmdparse.cpp)
 
-install (TARGETS optparse DESTINATION lib)
+install (TARGETS cmdparse DESTINATION lib)
