@@ -1,0 +1,126 @@
+.TH "util" 3 "Sun Mar 11 2018" "Version 0.3.0" "liboptparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+util \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Namespaces"
+
+.in +1c
+.ti -1c
+.RI " \fBconfig_constants\fP"
+.br
+.in -1c
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBopt_info\fP"
+.br
+.ti -1c
+.RI "class \fBopt_parser\fP"
+.br
+.ti -1c
+.RI "class \fBoption_language_error\fP"
+.br
+.ti -1c
+.RI "struct \fBoption_t\fP"
+.br
+.ti -1c
+.RI "class \fBparse_error\fP"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "using \fBopt_data_t\fP = std::multimap< std::string, std::string >"
+.br
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBMod_Prop\fP { \fBMod_Prop::NONE\fP, \fBMod_Prop::BEFORE\fP, \fBMod_Prop::AFTER\fP, \fBMod_Prop::SUB\fP, \fBMod_Prop::NOT_WITH\fP }"
+.br
+.ti -1c
+.RI "enum \fBNum_Prop\fP { \fBNum_Prop::ZERO_ONE\fP, \fBNum_Prop::ZERO_MANY\fP }"
+.br
+.ti -1c
+.RI "enum \fBAssign_Prop\fP { \fBAssign_Prop::NO_ASSIGN\fP, \fBAssign_Prop::EQ_REQUIRED\fP, \fBAssign_Prop::EQ_MAYBE\fP, \fBAssign_Prop::EQ_NEVER\fP }"
+.br
+.ti -1c
+.RI "enum \fBCollect_Prop\fP { \fBCollect_Prop::SCALAR\fP, \fBCollect_Prop::LIST\fP }"
+.br
+.ti -1c
+.RI "enum \fBData_Prop\fP { \fBData_Prop::STRING\fP, \fBData_Prop::INTEGER\fP, \fBData_Prop::FLOAT\fP }"
+.br
+.in -1c
+.SH "Typedef Documentation"
+.PP 
+.SS "using \fButil::opt_data_t\fP = typedef std::multimap<std::string, std::string>"
+
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fButil::Assign_Prop\fP\fC [strong]\fP"
+
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fINO_ASSIGN \fP\fP
+.TP
+\fB\fIEQ_REQUIRED \fP\fP
+.TP
+\fB\fIEQ_MAYBE \fP\fP
+.TP
+\fB\fIEQ_NEVER \fP\fP
+.SS "enum \fButil::Collect_Prop\fP\fC [strong]\fP"
+
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fISCALAR \fP\fP
+.TP
+\fB\fILIST \fP\fP
+.SS "enum \fButil::Data_Prop\fP\fC [strong]\fP"
+
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fISTRING \fP\fP
+.TP
+\fB\fIINTEGER \fP\fP
+.TP
+\fB\fIFLOAT \fP\fP
+.SS "enum \fButil::Mod_Prop\fP\fC [strong]\fP"
+
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fINONE \fP\fP
+.TP
+\fB\fIBEFORE \fP\fP
+.TP
+\fB\fIAFTER \fP\fP
+.TP
+\fB\fISUB \fP\fP
+.TP
+\fB\fINOT_WITH \fP\fP
+.SS "enum \fButil::Num_Prop\fP\fC [strong]\fP"
+
+.PP
+\fBEnumerator\fP
+.in +1c
+.TP
+\fB\fIZERO_ONE \fP\fP
+.TP
+\fB\fIZERO_MANY \fP\fP
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for liboptparse from the source code\&.

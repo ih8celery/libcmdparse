@@ -1,0 +1,53 @@
+.TH "util::opt_info" 3 "Sat Mar 17 2018" "Version 0.3.2-0" "liboptparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+util::opt_info \- represents data collected during parsing  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <options_parsing\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "bool \fBhas\fP (const std::string &) const "
+.br
+.RI "\fItest whether a particular option was found in parsing \fP"
+.ti -1c
+.RI "opt_data_t::size_type \fBcount\fP (const std::string &) const "
+.br
+.RI "\fIcount occurrences of option during parsing \fP"
+.ti -1c
+.RI "std::string \fBarg\fP (const std::string &, const std::string &='') const "
+.br
+.RI "\fIretrieve an option's argument, or default value if it had none \fP"
+.ti -1c
+.RI "RangePair \fBlist\fP (const std::string &) const "
+.br
+.RI "\fIretrieve the range of iterators with parameter as key \fP"
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "std::vector< std::string > \fBrest\fP"
+.br
+.RI "\fIcontains non-options found during parsing \fP"
+.in -1c
+.SS "Friends"
+
+.in +1c
+.ti -1c
+.RI "class \fBopt_parser\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+represents data collected during parsing 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for liboptparse from the source code\&.

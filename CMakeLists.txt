@@ -1,8 +1,8 @@
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.5)
 
 project (Cmdparse LANGUAGES CXX)
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 set (HOME ${CMAKE_CURRENT_LIST_DIR})
 set (CUSTOM_TEST_DRIVER "${HOME}/lib/tap")
 set (PROJECT_HEADERS "${HOME}/lib/include")
