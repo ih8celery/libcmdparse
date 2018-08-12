@@ -29,7 +29,13 @@ int main() {
 
   plan(5);
 
-  Info info = cmd.parse(argv, 2);
+  Info info;
+  try {
+    info = cmd.parse(argv, 2);
+  } catch (parse_error& e) {
+    std::cout << e.what() << std::endl;
+    return 0;
+  }
 
   ok(info.has("file"), "found file argument");
   ok(info.count("file") == 2, "found file argument twice");

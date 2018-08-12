@@ -13,26 +13,20 @@ constexpr int ARGC = 7;
 using namespace TAP;
 
 int main() {
-  plan(16);
+  plan(11);
 
   cli::Command cmd;
-  std::shared_ptr<cli::Option> opt;
   cli::Info info;
 
-  opt = cmd.option("--name=");
-  ok(opt->type == cli::Property::Arg_Type::STRING, "data type is STRING by default");
+  cmd.option("--name=");
 
-  opt = cmd.option("--friend-list=[]");
-  ok(opt->type == cli::Property::Arg_Type::STRING, "data type is STRING by default for lists");
+  cmd.option("--friend-list=[]");
   
-  opt = cmd.option("--friend-name=s");
-  ok(opt->type == cli::Property::Arg_Type::STRING, "STRING type can be given explicitly with 's'");
+  cmd.option("--friend-name=s");
 
-  opt = cmd.option("--age=!i");
-  ok(opt->type == cli::Property::Arg_Type::INTEGER, "INTEGER type can be given explicitly with 'i'");
+  cmd.option("--age=!i");
 
-  opt = cmd.option("-pi=?f");
-  ok(opt->type == cli::Property::Arg_Type::FLOAT, "FLOATING POINT type can be given explicitly with 'f'");
+  cmd.option("-pi=?f");
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"-pi=3";
@@ -68,13 +62,13 @@ int main() {
 
   ok(info.has("pi"), "option pi received");
 
-  ok(info.get("pi").second == "3.14", "pi is approximately 3.14");
+  ok(*info.find("pi") == "3.14", "pi is approximately 3.14");
 
-  ok(info.get("age").second == "7", "age is 7");
+  ok(*info.find("age") == "7", "age is 7");
 
-  ok(info.get("friend-name").second == "xavier", "my friend's name is xavier");
+  ok(*info.find("friend-name") == "xavier", "my friend's name is xavier");
 
-  ok(info.get("name").second == "george", "my name is george");
+  ok(*info.find("name") == "george", "my name is george");
 
   ok(info.rest.size() == 1, "EOI detected, remaining input moved to rest member");
 

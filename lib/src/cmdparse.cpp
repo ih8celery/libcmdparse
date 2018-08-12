@@ -195,45 +195,6 @@ namespace cli {
     }
   }
 
-  Option::Option(): number(Property::Number::ZERO_ONE),
-                    assignment(Property::Assignment::NO_ASSIGN),
-                    collection(Property::Collection::SCALAR),
-                    type(Property::Arg_Type::STRING) {}
-
-  std::pair<bool, std::string>
-  Info::get(const std::string& name) const {
-    opt_data_t::const_iterator iter = this->data.find(name);
-
-    if (iter == this->data.cend()) {
-      return std::make_pair(false, std::string(""));
-    }
-
-    return std::make_pair(true, iter->second);
-  }
-
-  std::tuple<bool,
-             std::unordered_multimap<std::string, std::string>::const_iterator,
-             std::unordered_multimap<std::string, std::string>::const_iterator>
-  Info::get_all(const std::string& name) const {
-    const auto rng = data.equal_range(name);
-
-    if (rng.first == data.cend()) {
-      return std::make_tuple(false, rng.first, rng.second);
-    }
-    else {
-      return std::make_tuple(true, rng.first, rng.second);
-    }
-  }
-
-  std::unordered_multimap<std::string, std::string>::size_type
-  Info::count(const std::string& name) const {
-    return data.count(name);
-  }
-
-  bool Info::has(const std::string& name) const {
-    return (data.find(name) != data.cend());
-  }
-
   Command::Command(): is_case_sensitive(true),
                       is_bsd_opt_enabled(false),
                       is_merged_opt_enabled(false),
@@ -255,16 +216,7 @@ namespace cli {
     this->commands.clear();
   }
 
-  bool operator<(const Option& l, const Option& r) noexcept {
-    return (l.name < r.name);
-  }
-
-  bool operator==(const Option& l, const Option& r) noexcept {
-    return (l.name == r.name);
-  }
-
-  std::shared_ptr<Command>
-  Command::command(const std::string& spec) {
+  std::shared_ptr<Command> Command::command(const std::string& spec) {
     if (spec == std::string("")) {
       throw command_error("subcommand may not be named after the empty string");
     }
@@ -277,8 +229,7 @@ namespace cli {
     }
   }
 
-  std::shared_ptr<Option>
-  Command::option(const char * spec, const std::string& name) {
+  std::shared_ptr<Option> Command::option(const std::string& spec, const std::string& name) {
     enum class Option_State {
       HANDLES, EQ, ARG,
       ARGLIST, ARGLIST_END, DONE,
@@ -299,7 +250,7 @@ namespace cli {
     while (true) {
       switch(state) {
       case Option_State::HANDLES:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           state = Option_State::DONE;
         }
 
@@ -333,7 +284,7 @@ namespace cli {
 
         break;
       case Option_State::MINUS_PREFIX:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           throw option_language_error(std::string("input ended before handle complete"));
         }
 
@@ -351,7 +302,7 @@ namespace cli {
 
         break;
       case Option_State::PLUS_PREFIX:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           throw option_language_error(std::string("input ended before handle complete"));
         }
 
@@ -367,7 +318,7 @@ namespace cli {
 
         break;
       case Option_State::PREFIX_END:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           throw option_language_error(std::string("input ended before handle complete"));
         }
 
@@ -383,7 +334,7 @@ namespace cli {
 
         break;
       case Option_State::NAME:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           if (!buf.str().empty()) {
             handle_vec.push_back(buf.str());
             buf.str("");
@@ -437,7 +388,7 @@ namespace cli {
 
         break;
       case Option_State::NUMBER:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           state = Option_State::DONE;
           break;
         }
@@ -463,7 +414,7 @@ namespace cli {
 
         break;
       case Option_State::EQ:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           state = Option_State::DONE;
           break;
         }
@@ -513,7 +464,7 @@ namespace cli {
 
         break;
       case Option_State::ARG:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           opt->type = Property::Arg_Type::STRING;
           state = Option_State::DONE;
 
@@ -549,7 +500,7 @@ namespace cli {
 
         break;
       case Option_State::ARGLIST:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           throw option_language_error(std::string(
                       "input ended in arg list"));
         }
@@ -583,7 +534,7 @@ namespace cli {
 
         break;
       case Option_State::ARGLIST_END:
-        if (spec[index] == '\0') {
+        if (index >= spec.size()) {
           throw option_language_error(std::string(
                       "input ended before arg list finished"));
         }
@@ -598,7 +549,7 @@ namespace cli {
 
         break;
       case Option_State::DONE:
-        if (spec[index] != '\0') {
+        if (index < spec.size()) {
           throw option_language_error(std::string("input found after option spec parsed"));
         }
         else {
@@ -664,7 +615,7 @@ namespace cli {
       if (index < 0) {
         index = 0;
       }
-      else if (spec[index] != '\0'){
+      else if (index < spec.size()){
         index++;
       }
     }
@@ -954,6 +905,10 @@ namespace cli {
     return *infop;
   }
 
+  Info Command::operator()(char ** argv, int argc) {
+    return parse(argv, argc, nullptr);
+  }
+
   void Command::configure(const std::string& spec) {
     if (!this->name.empty()) {
       throw command_error(std::string("special options cannot be enabled on named commands"));
@@ -992,9 +947,5 @@ namespace cli {
     else {
       return (name == iter->second->name);
     }
-  }
-
-  bool Info::has_command(const std::string& name) const {
-    return (this->commands.find(name) != this->commands.cend());
   }
 }

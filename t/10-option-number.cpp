@@ -12,22 +12,18 @@ using namespace TAP;
 constexpr int ARGC = 7;
 
 int main () {
-  plan(7);
+  plan(4);
 
   cli::Command cmd;
-  std::shared_ptr<cli::Option> opt;
 
   // definition of option/name has default number
-  opt = cmd.option("--has-opt");
-  ok(opt->number == cli::Property::Number::ZERO_ONE, "options have a default number of ZERO_ONE");
+  cmd.option("--has-opt");
 
   // explicit zero_one option
-  opt = cmd.option("-single?");
-  ok(opt->number == cli::Property::Number::ZERO_ONE, "options explicitly assigned ZERO_ONE number with '?'");
+  cmd.option("-single?");
 
   // explicit zero_many option
-  opt = cmd.option("-verbose*");
-  ok(opt->number == cli::Property::Number::ZERO_MANY, "option explicitly assigned ZERO_MANY number with '*'");
+  cmd.option("-verbose*");
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"-verbose";

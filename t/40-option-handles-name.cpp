@@ -15,21 +15,19 @@ constexpr int ARGC = 8;
 using namespace TAP;
 
 int main () {
-  plan(13);
+  plan(11);
 
   cli::Command cmd;
-  std::shared_ptr<cli::Option> opt;
 
   cmd.configure("ignore_case");
 
   // definition of option/name
-  opt = cmd.option("--has-opt*", "name");
-  ok(opt->name == "name", "the second argument to option is the name");
+  cmd.option("--has-opt*", "name");
   ok(cmd.handle_has_name("--has-opt", "name"),
       "a handle is a string used to identify the option to use in parsing");
 
   // extended definition of option/name 
-  opt = cmd.option("-repeat*", "name");
+  cmd.option("-repeat*", "name");
   ok(cmd.handle_has_name("-repeat", "name"),
       "option may be specified in multiple calls so long as name is same");
 
@@ -43,11 +41,10 @@ int main () {
   TRY_NOT_OK(cmd.option("---a"), "after prefix, handle must begin with [a-zA-Z0-9_]");
 
   // option may have multiple handles attached to it at once
-  opt = cmd.option("--is-opt|--is-option|-NAME");
+  cmd.option("--is-opt|--is-option|-NAME");
   ok(cmd.handle_has_name("--is-opt", "NAME"), "multiple handles separated by '|'");
   ok(cmd.handle_has_name("--is-option", "NAME"), "multiple handles separated by '|'");
   ok(cmd.handle_has_name("-NAME", "NAME"), "multiple handles separated by '|'");
-  ok(opt->name == "NAME", "when no name provided, option deduces name from last handle");
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"data";

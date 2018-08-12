@@ -1,0 +1,198 @@
+.TH "lib/include/options_parsing.h" 3 "Sat Mar 17 2018" "Version 0.3.2-0" "liboptparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+lib/include/options_parsing.h \- interface to parse command line arguments/options  
+
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <unordered_map>\fP
+.br
+\fC#include <set>\fP
+.br
+\fC#include <string>\fP
+.br
+\fC#include <vector>\fP
+.br
+\fC#include <exception>\fP
+.br
+
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "struct \fButil::config_constants::case_sensitive_t\fP"
+.br
+.ti -1c
+.RI "struct \fButil::config_constants::bsd_opt_t\fP"
+.br
+.ti -1c
+.RI "struct \fButil::config_constants::merged_opt_t\fP"
+.br
+.ti -1c
+.RI "struct \fButil::config_constants::error_if_unknown_t\fP"
+.br
+.ti -1c
+.RI "struct \fButil::config_constants::subcommand_t\fP"
+.br
+.ti -1c
+.RI "struct \fButil::option_t\fP"
+.br
+.RI "\fIcollects the properties and identity of an option \fP"
+.ti -1c
+.RI "class \fButil::opt_info\fP"
+.br
+.RI "\fIrepresents data collected during parsing \fP"
+.ti -1c
+.RI "class \fButil::opt_parser\fP"
+.br
+.RI "\fIclass controlling option declaration and parsing \fP"
+.ti -1c
+.RI "class \fButil::parse_error\fP"
+.br
+.RI "\fIthrown during parsing \fP"
+.ti -1c
+.RI "class \fButil::option_language_error\fP"
+.br
+.RI "\fIthrown when options declared or, in one case, at the start of parsing \fP"
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "using \fButil::opt_data_t\fP = std::unordered_multimap< std::string, std::string >"
+.br
+.ti -1c
+.RI "using \fButil::RangePair\fP = std::pair< opt_data_t::const_iterator, opt_data_t::const_iterator >"
+.br
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fButil::Mod_Prop\fP { \fBNONE\fP, \fButil::Mod_Prop::BEFORE\fP, \fButil::Mod_Prop::AFTER\fP, \fButil::Mod_Prop::SUB\fP, \fButil::Mod_Prop::NOT_WITH\fP }
+.RI "\fIdefines the type of modifier of an option \fP""
+.br
+.ti -1c
+.RI "enum \fButil::Num_Prop\fP { \fBZERO_ONE\fP, \fButil::Num_Prop::ZERO_MANY\fP }
+.RI "\fIdefines the number of times an option may appear \fP""
+.br
+.ti -1c
+.RI "enum \fButil::Assign_Prop\fP { \fBNO_ASSIGN\fP, \fButil::Assign_Prop::EQ_REQUIRED\fP, \fButil::Assign_Prop::EQ_MAYBE\fP, \fButil::Assign_Prop::EQ_NEVER\fP, \fButil::Assign_Prop::STUCK\fP }
+.RI "\fIdefines the mode of assignment supported by option \fP""
+.br
+.ti -1c
+.RI "enum \fButil::Collect_Prop\fP { \fBSCALAR\fP, \fButil::Collect_Prop::LIST\fP }
+.RI "\fIdefines how arguments are interpreted \fP""
+.br
+.ti -1c
+.RI "enum \fButil::Data_Prop\fP { \fBSTRING\fP, \fButil::Data_Prop::INTEGER\fP, \fButil::Data_Prop::FLOAT\fP }
+.RI "\fIdefines the type of data of an option's argument \fP""
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "const case_sensitive_t \fButil::config_constants::case_sensitive\fP = case_sensitive_t()"
+.br
+.ti -1c
+.RI "const bsd_opt_t \fButil::config_constants::bsd_opt\fP = bsd_opt_t()"
+.br
+.ti -1c
+.RI "const merged_opt_t \fButil::config_constants::merged_opt\fP = merged_opt_t()"
+.br
+.ti -1c
+.RI "const error_if_unknown_t \fButil::config_constants::error_unknown\fP = error_if_unknown_t()"
+.br
+.ti -1c
+.RI "const subcommand_t \fButil::config_constants::sub\fP = subcommand_t()"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+interface to parse command line arguments/options 
+
+
+.PP
+\fBAuthor:\fP
+.RS 4
+Adam Marshall (ih8celery) 
+.RE
+.PP
+
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fButil::Assign_Prop\fP\fC [strong]\fP"
+
+.PP
+defines the mode of assignment supported by option <assign_prop> := <nil> // Assign_Prop::NONE 
+.br
+ | '=' // Assign_Prop::EQ_REQUIRED 
+.br
+ | '=?' // Assign_Prop::EQ_MAYBE 
+.br
+ | '=!' // Assign_Prop::EQ_NEVER 
+.br
+ | '=|' // Assign_Prop::STUCK_ARG 
+.br
+ 
+.SS "enum \fButil::Collect_Prop\fP\fC [strong]\fP"
+
+.PP
+defines how arguments are interpreted <collect_prop> := <nil> // Collect_Prop::SCALAR 
+.br
+ | '['<data_prop>']' // Collect_Prop::LIST 
+.br
+ 
+.SS "enum \fButil::Data_Prop\fP\fC [strong]\fP"
+
+.PP
+defines the type of data of an option's argument <data_prop> := <nil> // Data_Prop::STRING 
+.br
+ | 's' // Data_Prop::STRING 
+.br
+ | 'i' // Data_Prop::INTEGER 
+.br
+ | 'f' // Data_Prop::FLOAT 
+.br
+ 
+.SS "enum \fButil::Mod_Prop\fP\fC [strong]\fP"
+
+.PP
+defines the type of modifier of an option a specification of the Mod_Prop conforms to the following: 
+.br
+ <mod_prop> := '['<modifier>']' | <nil> 
+.br
+ <modifier> := <mod_function><mod_arg> | <mod_setting> 
+.br
+ <mod_function> := '<' // Mod_Prop::BEFORE 
+.br
+ | '>' // Mod_Prop::AFTER 
+.br
+ | '!' // Mod_Prop::NOT_WITH 
+.br
+ <mod_arg> := <option_name> 
+.br
+ <mod_setting> := '&' // Mod_Prop::SUB 
+.br
+.PP
+in case a mod_function is used, the mod_arg need not name a 
+.br
+ valid option 
+.br
+ 
+.SS "enum \fButil::Num_Prop\fP\fC [strong]\fP"
+
+.PP
+defines the number of times an option may appear <num_prop> := <nil> // Num_Prop::ZERO_ONE 
+.br
+ | '?' // Num_Prop::ZERO_ONE 
+.br
+ | '*' // Num_Prop::ZERO_MANY 
+.br
+ 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for liboptparse from the source code\&.

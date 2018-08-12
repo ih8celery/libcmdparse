@@ -1,0 +1,180 @@
+.TH "util::opt_parser" 3 "Sat Mar 17 2018" "Version 0.3.2-0" "liboptparse" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+util::opt_parser \- class controlling option declaration and parsing  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <options_parsing\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBopt_parser\fP ()"
+.br
+.RI "\fIdefault constructor of class \fBopt_parser\fP \fP"
+.ti -1c
+.RI "\fBoption_t\fP \fBoption\fP (const char *, const std::string &='')"
+.br
+.RI "\fIdeclare an option to the parser \fP"
+.ti -1c
+.RI "\fBopt_info\fP \fBparse\fP (char **&argv, int argc)"
+.br
+.RI "\fIextract options from argv into an \fBopt_info\fP object \fP"
+.ti -1c
+.RI "void \fBset\fP (const \fBconfig_constants::case_sensitive_t\fP &c, bool val=true)"
+.br
+.RI "\fIconfigure \fBopt_parser\fP's case sensitivity when parsing \fP"
+.ti -1c
+.RI "void \fBset\fP (const \fBconfig_constants::bsd_opt_t\fP &c, bool val=true)"
+.br
+.RI "\fIconfigure \fBopt_parser\fP's ability to detect bsd-style options \fP"
+.ti -1c
+.RI "void \fBset\fP (const \fBconfig_constants::merged_opt_t\fP &c, bool val=true)"
+.br
+.RI "\fIconfigure \fBopt_parser\fP's ability to detect merged options \fP"
+.ti -1c
+.RI "void \fBset\fP (const \fBconfig_constants::error_if_unknown_t\fP &c, bool val=true)"
+.br
+.RI "\fIconfigure \fBopt_parser\fP's response to a char* in argv that resembles a valid option but is not known to the parser \fP"
+.ti -1c
+.RI "void \fBset\fP (const \fBconfig_constants::subcommand_t\fP &c, bool val=true)"
+.br
+.RI "\fIconfigure \fBopt_parser\fP's ability to detect subcommands \fP"
+.ti -1c
+.RI "bool \fBempty\fP () const "
+.br
+.RI "\fItests whether the parser has any registered options \fP"
+.ti -1c
+.RI "std::string \fBget_opt\fP (std::string spec, char **&argv, int argc)"
+.br
+.ti -1c
+.RI "std::vector< std::string > \fBget_opt_list\fP (std::string spec, char **&argv, int argc)"
+.br
+.ti -1c
+.RI "void \fBclear_options\fP ()"
+.br
+.RI "\fIclear the data collected from calls to \fBoption()\fP \fP"
+.ti -1c
+.RI "bool \fBhandle_has_name\fP (const std::string &handle, const std::string &name) const "
+.br
+.RI "\fItest whether option with handle has given name \fP"
+.in -1c
+.SH "Detailed Description"
+.PP 
+class controlling option declaration and parsing 
+.SH "Member Function Documentation"
+.PP 
+.SS "\fBoption_t\fP util::opt_parser::option (const char * spec, const std::string & name = \fC''\fP)"
+
+.PP
+declare an option to the parser option name is the second argument to the function 
+.br
+ see doc/option/spec\&.md for full description of options\&. 
+.br
+ throws an \fBoption_language_error\fP if something goes wrong 
+.br
+ 
+.SS "\fBopt_info\fP util::opt_parser::parse (char **& argv, int argc)"
+
+.PP
+extract options from argv into an \fBopt_info\fP object any options or data belonging to options is removed from 
+.br
+ argv and replaced with nullptr\&. 
+.br
+ throws a \fBparse_error\fP if something goes wrong 
+.br
+ this is the only \fBoption_language_error\fP thrown in the parse member function because calling this function is the only way to signify the end of option declarations\&. as stated in a previous comment, it is an error for subcommands to be enabled but not declared by calls to \fBoption()\fP
+.SS "void util::opt_parser::set (const \fBconfig_constants::case_sensitive_t\fP & c, bool val = \fCtrue\fP)\fC [inline]\fP"
+
+.PP
+configure \fBopt_parser\fP's case sensitivity when parsing case sensitivity of option names and stored handles is NOT affected 
+.br
+ default: true 
+.br
+ 
+.SS "void util::opt_parser::set (const \fBconfig_constants::bsd_opt_t\fP & c, bool val = \fCtrue\fP)\fC [inline]\fP"
+
+.PP
+configure \fBopt_parser\fP's ability to detect bsd-style options zero or more bsd-style options may then appear at the beginning of argv, 
+.br
+ under the following conditions: 
+.br
+.IP "1." 4
+option prefixes (-, --, +, etc) are not allowed in these options 
+.br
+
+.IP "2." 4
+option handles must be exactly one letter long without a prefix 
+.br
+
+.IP "3." 4
+options must be concatenated into one string, stored in argv[0] 
+.br
+
+.IP "4." 4
+the first invalid or incomplete option causes parsing to fail 
+.br
+ default: false 
+.br
+
+.PP
+.PP
+NOTE: 'BSD-style' options conflict with subcommands, so enabling 
+.br
+ this setting implicitly disables subcommands 
+.br
+ 
+.SS "void util::opt_parser::set (const \fBconfig_constants::merged_opt_t\fP & c, bool val = \fCtrue\fP)\fC [inline]\fP"
+
+.PP
+configure \fBopt_parser\fP's ability to detect merged options merged options are identical to bsd-style options except in one 
+.br
+ respect: the first option detected in argv[0] must include its 
+.br
+ prefix 
+.br
+ default: false 
+.br
+.PP
+NOTE: 'merged' options conflict with subcommands, so enabling 
+.br
+ this setting implicitly disables subcommands 
+.br
+ 
+.SS "void util::opt_parser::set (const \fBconfig_constants::error_if_unknown_t\fP & c, bool val = \fCtrue\fP)\fC [inline]\fP"
+
+.PP
+configure \fBopt_parser\fP's response to a char* in argv that resembles a valid option but is not known to the parser true causes error to be thrown when such an invalid option found\&. 
+.br
+ default: true 
+.br
+ 
+.SS "void util::opt_parser::set (const \fBconfig_constants::subcommand_t\fP & c, bool val = \fCtrue\fP)\fC [inline]\fP"
+
+.PP
+configure \fBopt_parser\fP's ability to detect subcommands \fBopt_parser\fP may not support subcommands and merged options or bsd options 
+.br
+ simultaneously\&. a subcommand may be any valid handle, but it must 
+.br
+ appear in argv[0]\&. if subcommands are enabled, it is an error 
+.br
+ NOT to provide one\&. subcommands may still be declared in the 
+.br
+ option spec, but will be ignored if this setting is false\&. 
+.br
+ default: false 
+.br
+.PP
+NOTE: subcommands conflict with 'BSD-style' and 'merged' options, 
+.br
+ so enabling this setting implicitly disables those settings 
+.br
+ 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for liboptparse from the source code\&.

@@ -12,22 +12,17 @@ constexpr int ARGC = 7;
 using namespace TAP;
 
 int main() {
-  plan(8);
+  plan(4);
 
   cli::Command cmd;
-  std::shared_ptr<cli::Option> opt;
 
-  opt = cmd.option("-humanity=s"); // eq_required
-  ok(opt->assignment == cli::Property::Assignment::EQ_REQUIRED, "equals sign is required in argument assignment");
+  cmd.option("-humanity=s"); // eq_required
   
-  opt = cmd.option("-age=?i"); // eq_maybe
-  ok(opt->assignment == cli::Property::Assignment::EQ_MAYBE, "equals sign is optional in argument assignment");
+  cmd.option("-age=?i"); // eq_maybe
 
-  opt = cmd.option("--is-stupid"); // no_assign
-  ok(opt->assignment == cli::Property::Assignment::NO_ASSIGN, "no assignment, so equals sign is not allowed");
+  cmd.option("--is-stupid"); // no_assign
 
-  opt = cmd.option("-wife=!s"); // eq_never
-  ok(opt->assignment == cli::Property::Assignment::EQ_NEVER, "equals sign not allowed in argument assignment");
+  cmd.option("-wife=!s"); // eq_never
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"data";
@@ -41,11 +36,11 @@ int main() {
   cli::Info info = cmd.parse(args, ARGC); 
   ok(info.rest.size() == 3, "found three non-options");
 
-  is(info.get("wife").second, "ellen", "wife's name is ellen");
+  is(*info.find("wife"), "ellen", "wife's name is ellen");
 
-  is(info.get("age").second, "42", "age is 42");
+  is(*info.find("age"), "42", "age is 42");
 
-  is(info.get("humanity").second, "yes", "type is human");
+  is(*info.find("humanity"), "yes", "type is human");
 
   done_testing();
 

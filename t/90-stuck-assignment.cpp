@@ -14,18 +14,14 @@ using namespace cli;
 constexpr std::size_t ARGC = 2;
 
 int main() {
-  std::shared_ptr<Option> opt;
   Command cmd;
   Info info;
 
-  plan(9);
+  plan(6);
 
-  opt = cmd.option("-S=|s", "stuck");
-  ok(opt->assignment == Property::Assignment::STUCK, "stuck has STUCK assignment");
-  ok(opt->type == Property::Arg_Type::STRING, "stuck has data type STRING");
+  cmd.option("-S=|s", "stuck");
 
-  opt = cmd.option("-W=|[s]", "stucklist");
-  ok(opt->assignment == Property::Assignment::STUCK, "stucklist has STUCK assignment");
+  cmd.option("-W=|[s]", "stucklist");
 
   TRY_NOT_OK(cmd.option("-Ab=|i", "forore"), "cannot create multiletter STUCK option");
   TRY_NOT_OK(cmd.option("-c=|s", "clan"), "cannot create lowercase handle to STUCK option");
@@ -38,7 +34,7 @@ int main() {
   info = cmd.parse(argv, 2);
 
   ok(info.has("stuck"), "found 'stuck' in argv");
-  ok(info.get("stuck").second == "imilar", "found 'stuck' argument");
+  ok(*info.find("stuck") == "imilar", "found 'stuck' argument");
   ok(info.count("stucklist") == 3, "found list of stuck arguments");
 
   delete [] argv;

@@ -13,22 +13,18 @@ constexpr int ARGC = 3;
 using namespace TAP;
 
 int main() {
-  plan(10);
+  plan(7);
 
   cli::Command cmd;
-  std::shared_ptr<cli::Option> opt;
   cli::Info info;
 
-  opt = cmd.option("--age=i");
-  ok(opt->collection == cli::Property::Collection::SCALAR, "collection type is SCALAR by default");
+  cmd.option("--age=i");
   
-  opt = cmd.option(":some-option");
-  ok(opt->collection == cli::Property::Collection::SCALAR, "collection type is SCALAR even with no arguments");
+  cmd.option(":some-option");
 
-  opt = cmd.option(".other-option=s", "other");
+  cmd.option(".other-option=s", "other");
 
-  opt = cmd.option("--friends=[s]");
-  ok(opt->collection == cli::Property::Collection::LIST, "LIST collection type");
+  cmd.option("--friends=[s]");
 
   char ** args = new char*[ARGC];
   args[0] = (char*)"--age=";

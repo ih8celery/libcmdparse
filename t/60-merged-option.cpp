@@ -14,14 +14,13 @@ using namespace cli;
 int main() {
   Command cmd;
   Info info;
-  std::shared_ptr<Option> opt;
 
   cmd.configure("merged_opt");
 
   cmd.option("d|-due?", "due");
   cmd.option("a", "awe");
   cmd.option("--afd", "AFD");
-  opt = cmd.option("f*", "file");
+  cmd.option("f*", "file");
 
   plan(6);
 
