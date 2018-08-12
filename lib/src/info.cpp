@@ -6,7 +6,6 @@
  * \brief parse command line arguments/options
  */
 #include "info.h"
-#include <algorithm>
 
 namespace cli {
   std::optional<std::string> Info::find(const std::string& name) const {

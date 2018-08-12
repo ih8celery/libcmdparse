@@ -615,7 +615,7 @@ namespace cli {
       if (index < 0) {
         index = 0;
       }
-      else if (index < spec.size()){
+      else if (index < spec.size()) {
         index++;
       }
     }

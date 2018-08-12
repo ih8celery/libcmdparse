@@ -9,7 +9,6 @@
 #define _MOD_CPP_COMMAND_PARSE_INFO
 
 #include "option.h"
-//#include "cmdparse.h"
 
 #include <unordered_map>
 #include <set>
