@@ -9,18 +9,138 @@
 
 #define _MOD_CPP_COMMAND_PARSE
 
-#include "option.h"
-#include "info.h"
-
 #include <unordered_map>
 #include <set>
 #include <string>
 #include <vector>
 #include <exception>
+#include <optional>
 #include <memory>
 #include <tuple>
 
 namespace cli {
+  namespace Property {
+    /**
+     * \enum Number
+     * \brief defines the number of times an option may appear
+     *
+     * <number> := <nil> // Number::ZERO_ONE <br>
+     *          | '?'    // Number::ZERO_ONE <br>
+     *          | '*'    // Number::ZERO_MANY <br>
+     */
+    enum class Number {
+      ZERO_ONE, ZERO_MANY
+    };
+
+    /**
+     * \enum Assignment
+     * \brief defines the mode of assignment supported by option
+     *
+     * <assignment> := <nil> // Assignment::NONE <br>
+     *              | '='   // Assignment::EQ_REQUIRED <br>
+     *              | '=?'  // Assignment::EQ_MAYBE <br>
+     *              | '=!'  // Assignment::EQ_NEVER <br>
+     *              | '=|'  // Assignment::STUCK_ARG <br>
+     */
+    enum class Assignment {
+      NO_ASSIGN, EQ_REQUIRED, EQ_MAYBE, EQ_NEVER, STUCK
+    };
+    
+    /**
+     * \enum Collection
+     * \brief defines how arguments are interpreted
+     *
+     * <collection> := <nil>            // Collection::SCALAR <br>
+     *              | '['<data_prop>']' // Collection::LIST <br>
+     */
+    enum class Collection {
+      SCALAR, LIST
+    };
+    
+    /**
+     * \enum Arg_Type
+     * \brief defines the type of data of an option's argument
+     *
+     * <data_type> := <nil> // Arg_Type::STRING <br>
+     *             | 's'   // Arg_Type::STRING <br>
+     *             | 'i'   // Arg_Type::INTEGER <br>
+     *             | 'f'   // Arg_Type::FLOAT <br>
+     */
+    enum class Arg_Type {
+      STRING, INTEGER, FLOAT
+    };
+  }
+
+  /**
+   * \struct Option
+   * \brief collect the properties and identity of option
+   */
+  class Option {
+    public:
+      Option();
+
+      Property::Number number;
+      Property::Assignment assignment;
+      Property::Collection collection;
+      Property::Arg_Type type;
+      std::string name;
+
+      friend bool operator<(const Option&, const Option&) noexcept;
+      friend bool operator==(const Option&, const Option&) noexcept;
+  };
+
+  using opt_data_t = std::unordered_multimap<std::string, std::string>;
+  /**
+   * \class Info
+   * \brief represent data collected during parsing
+   */
+  class Info {
+    friend class Command;
+
+    public:
+      /**
+       * \fn bool has(const string&)
+       * \brief test whether a particular option was found in parsing
+       */
+      bool has(const std::string&) const;
+
+      /**
+       * \fn bool has_command(const string&)
+       * \brief test whether a command was found in argv
+       */
+      bool has_command(const std::string&) const;
+      
+      /**
+       * \fn optional<string> find(const string&)
+       * \brief retrieve value of option
+       */
+      std::optional<std::string> find(const std::string&) const;
+      std::optional<std::string> operator[] (const std::string&) const;
+      
+      /**
+       * \fn optional<vector<string>> find_all(const string&)
+       * \brief retrieve the vector of values under name
+       */
+      std::optional<std::vector<std::string>> find_all(const std::string&) const;
+
+      /**
+       * \fn opt_data_t::size_type count(const string&)
+       * \brief count occurrences of option during parsing
+       */
+      opt_data_t::size_type count(const std::string&) const;
+
+      /**
+       * \var vector<string> rest
+       * \brief contains non-options found during parsing
+       */
+      std::vector<std::string> rest;
+
+    private:
+      opt_data_t data;
+      std::set<std::string> commands;
+  };
+
+
   /**
    * \class opt_parser
    * \brief class controlling option declaration and parsing
