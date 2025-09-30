@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        build_type: [Release]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMDPARSE_BUILD_TESTS=OFF
+        shell: bash
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.build_type }}
+        shell: bash
+
+      - name: Install
+        run: cmake --install build --config ${{ matrix.build_type }} --prefix "$GITHUB_WORKSPACE/install"
+        shell: bash
+
+      - name: Verify package config
+        run: |
+          cmake -E make_directory package-check
+          cat <<'EOCMAKE' > package-check/CMakeLists.txt
+          cmake_minimum_required(VERSION 3.15)
+          project(cmdparse_package_probe LANGUAGES CXX)
+          find_package(cmdparse CONFIG REQUIRED)
+          add_executable(package_probe main.cpp)
+          target_link_libraries(package_probe PRIVATE cmdparse::cmdparse)
+          EOCMAKE
+
+          cat <<'EOCXX' > package-check/main.cpp
+          #include <cmdparse.h>
+
+          int main() {
+            cli::Command command;
+            command.option("-h|--help", "help");
+            return 0;
+          }
+          EOCXX
+
+          cmake -S package-check -B package-build -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/install" -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          cmake --build package-build --config ${{ matrix.build_type }}
+        shell: bash

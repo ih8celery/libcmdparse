@@ -130,10 +130,10 @@ this scenario.
     contains the non-option strings from the parsing source
 
 ## Dependencies
-  libcmdparse depends only on the standard library of C++11
+  libcmdparse depends only on the standard library of C++17
 
-  building it requires CMake >= 3.0, Make, and a C++ compiler
-that supports C++11.
+  building it requires CMake >= 3.15, Make, and a C++ compiler
+that supports C++17.
 
   all tests depend on my version of libtap++, which is based on Leon
 Timmermans' implementation.
@@ -155,23 +155,33 @@ info.count("verbosity"); // returns 2
 
 # Installation
 
-## Ubuntu/Debian
-after running cmake, use make to build, test, and install:
+## Build & install with cmake
+configure the project in its own build tree:
 ```shell
-make
-make test
-sudo make install
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+cmake --install build --prefix /usr/local
 ```
 
-make's `debug` target can be used in place of `test`. it runs uses a
-shell script as a substitute for CTest, the test driver included with
-CMake, because CTest does not play well with unit test libraries.
-invoke ctest manually if you cannot or don't wish to run the script.
-in that case, for better test output I recommend that you invoke ctest
-with the `--verbose` option.
+to consume the library from another project, rely on the generated package config:
+```cmake
+find_package(cmdparse CONFIG REQUIRED)
+add_executable(app main.cpp)
+target_link_libraries(app PRIVATE cmdparse::cmdparse)
+```
 
-## Windows
-libcmdparse doesn't support Windows
+on systems that prefer pkg-config, an install also provides `cmdparse.pc`:
+```shell
+pkg-config --cflags --libs cmdparse
+```
+
+## Ubuntu/Debian
+if you prefer make-based workflows, after running cmake invoke:
+```shell
+cmake --build build
+ctest --test-dir build
+sudo cmake --install build
+```
 
 # License
 
